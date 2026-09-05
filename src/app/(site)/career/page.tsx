@@ -10,7 +10,7 @@ import styles from './career.module.css';
 export const metadata: Metadata = {
   title: 'Careers',
   description:
-    'Build the robots that go where people shouldn’t — why the work matters, who you would work with, and the open roles in Ahmedabad.',
+    'Build robots. Solve hard problems. Make an impact. Why the work matters, who you would work with, and the open roles in Ahmedabad.',
 };
 
 /* ---------------------------------------------------------------------------
@@ -143,10 +143,10 @@ export default function CareerPage() {
         <div className={styles.heroInner}>
           <div className="fade-up">
             <span className="eyebrow">Careers at {SITE.name}</span>
-            <h1 className={cn('hero-title', styles.heroTitle)}>Build the robots that go where people shouldn&apos;t</h1>
+            <h1 className={cn('hero-title', styles.heroTitle)}>Build robots. Solve hard problems. Make an impact.</h1>
             <p className={cn('hero-lead', styles.heroLead)}>
-              Autonomous ground platforms for hazardous inspection, defence and critical infrastructure. A small team,
-              real hardware, and work that leaves the building.
+              Join a hands-on robotics team building autonomous platforms for hazardous environments, critical
+              infrastructure and defence.
             </p>
             <div className={styles.heroActions}>
               <Link href="/career/open-positions" className="btn btn-light">
