@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import type { Route } from 'next';
 import Cta from '@/components/sections/Cta';
 import { ArrowLeftIcon, ArrowRightIcon } from '@/components/ui/Icons';
-import { INSIGHTS_BY_DATE } from '@/data/insights';
+import { INSIGHTS_BY_DATE, INSIGHTS_LIVE } from '@/data/insights';
 import { cn } from '@/lib/dom';
 import ArticleOutline, { type OutlineItem } from './ArticleOutline';
 import styles from './article.module.css';
@@ -13,8 +13,13 @@ interface PageProps {
   readonly params: Promise<{ readonly slug: string }>;
 }
 
-/** Every post is known at build time, so all of them can be prerendered. */
+/**
+ * Every post is known at build time, so all of them can be prerendered.
+ * While the section is held back nothing is, which with `dynamicParams = false`
+ * below makes every slug a real 404.
+ */
 export function generateStaticParams(): Array<{ slug: string }> {
+  if (!INSIGHTS_LIVE) return [];
   return INSIGHTS_BY_DATE.map((post) => ({ slug: post.slug }));
 }
 
@@ -28,6 +33,8 @@ export function generateStaticParams(): Array<{ slug: string }> {
 export const dynamicParams = false;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  if (!INSIGHTS_LIVE) return { title: 'Page not found' };
+
   const { slug } = await params;
   const post = INSIGHTS_BY_DATE.find((entry) => entry.slug === slug);
   if (!post) return { title: 'Article not found' };
@@ -57,6 +64,9 @@ const SUMMARY_ID = 'summary';
  * takeaways, related posts and the pager.
  */
 export default async function InsightArticlePage({ params }: PageProps) {
+  // Held back until the posts are signed off; see INSIGHTS_LIVE.
+  if (!INSIGHTS_LIVE) notFound();
+
   const { slug } = await params;
 
   const index = INSIGHTS_BY_DATE.findIndex((entry) => entry.slug === slug);

@@ -34,6 +34,16 @@ import type { InsightCategory, InsightDraft, InsightPost } from './types';
 
 export type { ArticleSection, InsightCategory, InsightDraft, InsightPost } from './types';
 
+/**
+ * Whether /insights and /insights/[slug] are served at all.
+ *
+ * The posts below are still drafts, so until they are signed off both routes
+ * answer with the site's 404 page. Everything else stays in place — the pages,
+ * their styles and the nav links that point here — so flipping this to `true`
+ * publishes the section exactly as it is.
+ */
+export const INSIGHTS_LIVE = false;
+
 /** Filter order on the index. "All" is added by the UI. */
 export const INSIGHT_CATEGORIES: readonly InsightCategory[] = [
   'Technology',
