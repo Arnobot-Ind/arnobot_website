@@ -1,27 +1,6 @@
 'use client';
 
-import Script from 'next/script';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-
-/**
- * The production key is registered against arnobot.in only, so on localhost the
- * widget refuses to render with "Localhost is not in the list of supported
- * domains for this site key". Google publishes a test pair that is accepted on
- * every domain and always passes verification, which is what development gets.
- *
- * https://developers.google.com/recaptcha/docs/faq#localhost
- *
- * Set NEXT_PUBLIC_RECAPTCHA_SITE_KEY to override either default. To exercise
- * the real key locally instead, add `localhost` to the key's domain list in the
- * reCAPTCHA admin console — the test key is only a development convenience, and
- * a form guarded by it is NOT actually protected.
- */
-const GOOGLE_TEST_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
-const ARNOBOT_SITE_KEY = '6LeOIUEtAAAAAI7RDLFBKe0dMjemzaf1rbovBZ9Q';
-
-const RECAPTCHA_SITE_KEY =
-  process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ??
-  (process.env.NODE_ENV === 'development' ? GOOGLE_TEST_SITE_KEY : ARNOBOT_SITE_KEY);
+import { useState } from 'react';
 
 const INQUIRY_OPTIONS = [
   'Schedule a Consultation',
@@ -32,78 +11,27 @@ const INQUIRY_OPTIONS = [
   'General Inquiry',
 ] as const;
 
-interface ReCaptcha {
-  render: (container: HTMLElement, options: { sitekey: string }) => number;
-  getResponse: (widgetId?: number) => string;
-  /** Present once the API has finished loading; runs the callback when ready. */
-  ready?: (callback: () => void) => void;
-}
-
-declare global {
-  interface Window {
-    grecaptcha?: ReCaptcha;
-  }
-}
-
 /**
- * Contact form — the fields of the form in contact.php plus its inline
- * reCAPTCHA guard, dressed in the site-wide `.form-*` classes from
- * public/assets/css/style.css.
+ * Contact form — the fields of the form in contact.php, dressed in the
+ * site-wide `.form-*` classes from public/assets/css/style.css.
  *
- * It still performs a real POST (now to /api/contact) which redirects back to
+ * It performs a real POST (to /api/contact) which redirects back to
  * /contact?success=1 or ?error=…, so it keeps working without JavaScript. The
  * inquiry router is a radio group rather than a <select> for the same reason:
  * every route is visible, and `:checked` needs no script.
+ *
+ * There is no reCAPTCHA. The key was registered against `arnobot.in` alone, so
+ * on any other host — a Netlify deploy preview, the staging domain — the widget
+ * rendered "ERROR for site owner: Invalid domain for site key" and the form
+ * could not be submitted at all. Spam is now held off by the honeypot below;
+ * if reCAPTCHA comes back, add every deploy domain to the key first.
  */
 export default function ContactForm() {
-  const captchaRef = useRef<HTMLDivElement>(null);
-  const [captchaError, setCaptchaError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  /**
-   * Arriving via a client-side navigation means the reCAPTCHA script has already
-   * run and will not auto-render again, so render the widget explicitly.
-   */
-  useEffect(() => {
-    let cancelled = false;
-
-    const render = () => {
-      if (cancelled) return;
-      const container = captchaRef.current;
-      // The API auto-renders `.g-recaptcha` on first load; only step in if it did not.
-      if (!container || container.childElementCount > 0) return;
-      if (typeof window.grecaptcha?.render !== 'function') return;
-      try {
-        window.grecaptcha.render(container, { sitekey: RECAPTCHA_SITE_KEY });
-      } catch {
-        // Already rendered by the auto-loader.
-      }
-    };
-
-    // `grecaptcha.ready` is the documented "API is usable now" hook; the interval
-    // is the fallback for the window before the script has defined it at all.
-    const whenReady = () => window.grecaptcha?.ready?.(render) ?? render();
-    whenReady();
-
-    const timer = window.setInterval(whenReady, 250);
-    return () => {
-      cancelled = true;
-      window.clearInterval(timer);
-    };
-  }, []);
-
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    const token = window.grecaptcha?.getResponse?.() ?? '';
-
-    if (!token) {
-      event.preventDefault();
-      setCaptchaError('Please verify that you are not a robot.');
-      return;
-    }
-
-    setCaptchaError('');
-    setSubmitting(true);
-  };
+  /* The submit is a real form POST, so this only puts the button into its
+     sending state — the navigation itself is the browser's. */
+  const onSubmit = () => setSubmitting(true);
 
   return (
     <>
@@ -232,13 +160,15 @@ export default function ContactForm() {
           />
         </div>
 
-        <div className="form-captcha">
-          <div className="g-recaptcha" data-sitekey={RECAPTCHA_SITE_KEY} ref={captchaRef} suppressHydrationWarning />
+        {/* Honeypot. `sr-only` takes it off the screen without `display: none`,
+            which some bots skip, and `aria-hidden` plus `tabIndex={-1}` keep it
+            out of the accessibility tree and the tab order so a person never
+            meets it. A bot that fills every field fills this one, and
+            /api/contact then drops the submission. */}
+        <div className="sr-only" aria-hidden="true">
+          <label htmlFor="cf-website">Website</label>
+          <input type="text" id="cf-website" name="website" tabIndex={-1} autoComplete="off" />
         </div>
-
-        <p id="captcha-error" className="field-error" role="alert" aria-live="assertive">
-          {captchaError}
-        </p>
 
         <div className="form-actions">
           <button type="submit" className="btn" id="contact-submit-btn" disabled={submitting} aria-busy={submitting}>
@@ -257,8 +187,6 @@ export default function ContactForm() {
           <p className="form-note">We respect your privacy. Your information is never shared.</p>
         </div>
       </form>
-
-      <Script src="https://www.google.com/recaptcha/api.js" strategy="afterInteractive" />
     </>
   );
 }

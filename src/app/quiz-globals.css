@@ -1,0 +1,168 @@
+/* ==========================================================================
+   Hiring-assistant styles — the /apply screening flow and the /admin desk.
+
+   Imported by the (quiz) route group only, never by the marketing site. That
+   scoping is what makes Tailwind's preflight safe to load here: the base reset
+   would re-style the headings, lists, images and borders that public/assets/css/
+   style.css owns, so the root globals.css deliberately leaves it out. The quiz
+   is a Tailwind-designed app with no style.css underneath it, and it needs the
+   reset — importing it in this file, which only (quiz) pages load, gives the
+   quiz its reset without the marketing pages ever seeing it.
+
+   Ported from the Tailwind v3 config on master: `@tailwind base/components/
+   utilities` and tailwind.config.js do not exist in v4, so the directives
+   became the three imports below and the config's `theme.extend` became the
+   `@theme` block. Without that port the directives emit nothing and every
+   screen in the quiz renders unstyled.
+   ========================================================================== */
+
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/*
+  Only the quiz's own files contribute classes to this sheet. The root
+  globals.css scans all of src/, but it cannot emit these utilities: its
+  `@theme` has no `--color-body` or `--color-line`, so `text-body` and
+  `border-line` would simply not exist. They are generated here instead,
+  against the palette below.
+*/
+@source '../components/quiz/**/*.{ts,tsx}';
+@source './(quiz)/**/*.{ts,tsx}';
+
+/*
+  The ARNOBOT light design system for the hiring assistant, carried over from
+  master's tailwind.config.js unchanged.
+
+  Two of these names — `ink` and `muted` — also exist in the root globals.css,
+  with different values (the marketing ink is #070322, this one is a lighter
+  near-navy). Redefining them is safe precisely because this file is scoped:
+  Tailwind v4 utilities read `var(--color-ink)` at use time, so the override
+  lands only on the pages that load this sheet.
+*/
+@theme {
+  --color-canvas: #f4f7fc; /* page background (soft blue-white) */
+  --color-surface: #ffffff; /* cards / panels */
+  --color-surfaceAlt: #eef3fa; /* subtle fills, table headers, hover */
+  --color-line: #e4e9f2; /* hairline borders */
+  --color-line2: #d3dcea; /* stronger borders */
+  --color-ink: #141a33; /* primary text / headings */
+  --color-body: #3e4869; /* body text */
+  --color-muted: #6e7894; /* secondary / helper text */
+
+  /* brand */
+  --color-navy: #230c75;
+  --color-navy2: #180953;
+  --color-steel: #375e9d;
+  --color-brightblue: #2f62c4;
+
+  /* semantic */
+  --color-ok: #15a34a;
+  --color-okbg: #e9f7ee;
+  --color-bad: #dc2626;
+  --color-badbg: #fcebeb;
+  --color-warn: #b45309;
+
+  /* The root layout loads Inter by its literal family name for the marketing
+     site; the quiz reuses it rather than fetching a second face. */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 64, 0.04), 0 8px 24px rgba(16, 24, 64, 0.06);
+  --shadow-pop: 0 12px 34px rgba(35, 12, 117, 0.12);
+  --shadow-btn: 0 8px 18px rgba(35, 12, 117, 0.22);
+  --shadow-nav: 0 1px 0 rgba(16, 24, 64, 0.06);
+
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.125rem;
+
+  --animate-pop: pop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade: fade 0.3s ease-out;
+}
+
+@keyframes pop {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: #f4f7fc;
+  color: #3e4869;
+}
+
+/* Soft brand wash at the top of the page for a little depth on white */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    900px 380px at 50% -8%,
+    rgba(55, 94, 157, 0.1),
+    rgba(244, 247, 252, 0) 70%
+  );
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cdd7e6;
+  border-radius: 10px;
+  border: 3px solid #f4f7fc;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Reusable surfaces */
+.card {
+  background: #ffffff;
+  border: 1px solid #e4e9f2;
+  border-radius: 1.125rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 64, 0.04), 0 8px 24px rgba(16, 24, 64, 0.06);
+}
+
+/* ARNOBOT brand gradient (navy → steel) for accents */
+.brand-gradient {
+  background-image: linear-gradient(135deg, #230c75 0%, #2f4ea0 60%, #375e9d 100%);
+}
+.brand-text-gradient {
+  background-image: linear-gradient(100deg, #230c75, #375e9d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #97a0b8;
+}

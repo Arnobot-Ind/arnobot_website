@@ -948,12 +948,6 @@ select.form-input,
   color: var(--danger);
 }
 
-/* The reCAPTCHA iframe has a fixed width; never let it push the form wider. */
-.form-captcha {
-  max-width: 100%;
-  overflow: hidden;
-}
-
 .field-error:empty {
   display: none;
 }
@@ -1790,6 +1784,21 @@ select.form-input,
   }
 }
 
+/* ── Home hero: the four-platform montage ───────────────────────────────
+   The hero clip cycles four locations, so its top band can no longer be vetted
+   per-clip the way a single fixed clip's could. The site header is transparent
+   by design and has no scrim of its own, and `.hero-cinematic::after` fades to
+   nothing above 78% — exactly where the white nav sits. Two of the four shots
+   are a sunlit road and a pale ship hull; without the third gradient below the
+   nav is unreadable over both. Scoped to the home hero, because the product
+   pages reuse `.hero.hero-cinematic`. */
+.hero.hero-cinematic#home::after {
+  background:
+    linear-gradient(to top, rgba(var(--ink-rgb), 0.88) 0%, rgba(var(--ink-rgb), 0.52) 22%, rgba(var(--ink-rgb), 0.16) 48%, rgba(var(--ink-rgb), 0) 78%),
+    linear-gradient(to right, rgba(var(--ink-rgb), 0.55) 0%, rgba(var(--ink-rgb), 0.16) 40%, rgba(var(--ink-rgb), 0) 72%),
+    linear-gradient(to bottom, rgba(var(--ink-rgb), 0.52) 0%, rgba(var(--ink-rgb), 0.16) calc(var(--nav-height) + 34px), rgba(var(--ink-rgb), 0) calc(var(--nav-height) + 96px));
+}
+
 /* ── Full-screen band rhythm shared by About, Products, Industries ─────── */
 .about,
 .products,
@@ -2334,7 +2343,7 @@ select.form-input,
   flex: 0 0 calc((100% - (3 * var(--gap-card))) / 4);
   flex-direction: column;
   min-width: 0;
-  height: 378px;
+  height: 315px;
   overflow: hidden;
   background: var(--white);
   border: 1px solid var(--line);
@@ -2357,7 +2366,9 @@ select.form-input,
 .industry-img-wrap {
   position: relative;
   width: 100%;
-  height: 252px;
+  /* 190px cropped the machine out of the taller frames — `cover` was taking the
+     middle band and losing the wheels. 20% more height gives the subject room. */
+  height: 228px;
   overflow: hidden;
   background: var(--surface-2);
 }
@@ -2366,6 +2377,9 @@ select.form-input,
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* A resting zoom, so the machine reads at card size rather than sitting small
+     in the middle of its terrain. The taller box above is what pays for it. */
+  transform: scale(1.08);
   filter: grayscale(80%) contrast(105%);
   transition: filter var(--t-slower) ease, transform var(--t-slowest) var(--ease-lift);
 }
@@ -2373,7 +2387,7 @@ select.form-input,
 .industry:hover .industry-img-wrap img,
 .industry:focus-visible .industry-img-wrap img {
   filter: grayscale(0%) contrast(110%);
-  transform: scale(1.08);
+  transform: scale(1.16);
 }
 
 .industry-info {
@@ -2430,13 +2444,21 @@ select.form-input,
   margin-top: 4px;
 }
 
+/* The dot is 10px of paint inside a 24px target. A 10x10 button is under the
+   24x24 minimum in WCAG 2.5.8 and is genuinely hard to hit on a phone, but
+   growing the dot itself would wreck the rhythm of the row — so the button
+   carries the target and `::before` carries the mark. `background-clip` keeps
+   the painted dot off the padding. */
 .industry-dot {
+  position: relative;
   width: 10px;
   height: 10px;
-  padding: 0;
+  padding: 7px;
   border: 0;
   border-radius: var(--radius-round);
   background: rgba(var(--accent-deep-rgb), 0.2);
+  background-clip: content-box;
+  box-sizing: content-box;
   cursor: pointer;
   transition:
     width var(--t-med) var(--ease-menu),
@@ -2444,24 +2466,26 @@ select.form-input,
     border-radius var(--t-med) ease;
 }
 
+/* Both of these set `background` as a shorthand, which resets background-clip
+   to border-box — and would paint the dot across the whole 24px target instead
+   of the 10px mark. Restate the clip rather than switching to
+   background-color, so the pair reads the same as the base rule. */
 .industry-dot:hover {
   background: rgba(var(--accent-deep-rgb), 0.45);
+  background-clip: content-box;
 }
 
 .industry-dot.active {
   width: 28px;
   border-radius: 5px;
   background: var(--accent-deep);
+  background-clip: content-box;
 }
 
 @media (max-width: 1023px) {
   .industry {
     flex: 0 0 calc((100% - var(--gap-card)) / 2);
-    height: 360px;
-  }
-
-  .industry-img-wrap {
-    height: 232px;
+    height: 300px;
   }
 
   .industry-slider-wrapper {
@@ -2480,7 +2504,7 @@ select.form-input,
 @media (max-width: 600px) {
   .industry {
     flex: 0 0 100%;
-    height: 360px;
+    height: 300px;
   }
 
   .industry-slider-track {
@@ -4389,6 +4413,89 @@ p.value-current.is-display {
   to {
     opacity: 0;
     transform: translateX(40px);
+  }
+}
+
+/* ==========================================================================
+   Touch sizing — phones and small tablets only.
+
+   Everything here is gated at max-width: 767px, so the desktop and laptop
+   layouts (1440 and 1024, both measured clean) are untouched by design. The
+   rules raise controls to a 44px touch target; they do not restyle anything.
+
+   Deliberately NOT included: links that sit inside running prose — the
+   "careers" link in the founder's letter, the address and email inside a
+   sentence on Contact, and `.legal-link` in the legal copy. Padding an inline
+   link to 44px breaks the line box it lives in, and a reader taps those from
+   the flow of a sentence rather than hunting for them in a list.
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  /* Footer. Every page carries it, and it was the bulk of the small targets:
+     twelve stacked links at 25px each. The padding now supplies the rhythm,
+     so the list gap comes down to stop the column doubling in height. */
+  .footer-links,
+  .footer-contact {
+    gap: 2px;
+  }
+
+  .footer-links a,
+  .footer-contact a,
+  .footer-bottom a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 4px 0;
+  }
+
+  /* The contact rows lead with an icon that is top-aligned for multi-line
+     addresses; with a 44px link beside it the icon needs to come back to the
+     middle or it floats above the text. */
+  .footer-contact li {
+    align-items: center;
+  }
+
+  .footer-contact svg {
+    margin-top: 0;
+  }
+
+  /* The social marks stay 37px; only the hit area grows around them. */
+  .socials a {
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* The carousel dots are drawn with `background-clip: content-box`, so the
+     padding is invisible — the target grows to 44px tall while the dot itself
+     stays 10px. Horizontal padding is left alone: the dots sit in a row, and
+     44px-wide targets would overlap each other, which mis-taps worse than a
+     small target does. */
+  .industry-dot {
+    padding: 17px 7px;
+  }
+
+  /* The legal page's table of contents: a real list of links, so these do get
+     the full target. */
+  .legal-toc-link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* The values rotator is display type on one nowrap line. "Client-Centric
+   Innovation" is wider than a 320px screen, so below the small-phone break the
+   line is allowed to wrap and the sizer that reserves its box wraps with it. */
+@media (max-width: 420px) {
+  p.value-current.is-display {
+    font-size: var(--fs-h2);
+  }
+
+  .word-rotate-sizer,
+  .word-rotate-word {
+    white-space: normal;
   }
 }
 

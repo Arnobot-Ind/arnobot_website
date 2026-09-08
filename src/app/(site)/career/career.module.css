@@ -963,3 +963,23 @@
     width: 100%;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Touch sizing — the facility carousel's segment controls.
+
+   Each segment is already 44px tall around its 2px line, but they share one
+   row with `flex: 1 1 0`, so on a 320px screen they collapse to about 21px
+   wide — under the 24px minimum. A floor on the width holds them above it;
+   the row keeps its full width, so the segments simply stop shrinking.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  .segment {
+    min-width: 28px;
+  }
+
+  .segments {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+}

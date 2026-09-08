@@ -18,11 +18,33 @@ export const metadata: Metadata = {
 /* The four-layer architecture — its copy, wiring and motion — lives with the
    diagram in src/components/sections/technology/ArchitectureDiagram.tsx. */
 
+/**
+ * A card that opens with a photograph. The picture is the evidence for the
+ * sentence under it — the sensor being described, the switch being described —
+ * so each one carries real alt text rather than `alt=""`.
+ */
+type CardImage = { readonly image: string; readonly alt: string };
+
 /** The onboard loop, in the order the robot runs it. One line each. */
-const PERCEPTION_STEPS: ReadonlyArray<{ readonly name: string; readonly body: string }> = [
-  { name: 'Perceive', body: 'Laser, camera and inertial data fused on the robot. Detection runs onboard, not in the cloud.' },
-  { name: 'Localise', body: 'Centimetre-grade with a satellite fix. Its own map without one — underground, indoors, under steel.' },
-  { name: 'Decide', body: 'Missions are an area, not a joystick input. It replans around obstacles and resumes the pass.' },
+const PERCEPTION_STEPS: ReadonlyArray<{ readonly name: string; readonly body: string } & CardImage> = [
+  {
+    name: 'Perceive',
+    body: 'Laser, camera and inertial data fused on the robot. Detection runs onboard, not in the cloud.',
+    image: '/assets/images/tech-loop-perceive.webp',
+    alt: 'The sensor head on a Saibya mast in the field: a camera housing on each side, the radio antennas, and the amber warning beacon above them.',
+  },
+  {
+    name: 'Localise',
+    body: 'Centimetre-grade with a satellite fix. Its own map without one — underground, indoors, under steel.',
+    image: '/assets/images/tech-loop-localise.webp',
+    alt: 'The scanning laser bolted to the Saibya deck — the sensor the robot builds its own map from when there is no satellite fix.',
+  },
+  {
+    name: 'Decide',
+    body: 'Missions are an area, not a joystick input. It replans around obstacles and resumes the pass.',
+    image: '/assets/images/tech-loop-decide.webp',
+    alt: 'The ARNOBOT Ground Control Station with five waypoints placed across satellite imagery: a mission is handed over as ground to cover, not steered by hand.',
+  },
 ];
 
 /**
@@ -30,21 +52,29 @@ const PERCEPTION_STEPS: ReadonlyArray<{ readonly name: string; readonly body: st
  * qualities rather than a sequence, so the small accent line carries a tag
  * instead of a step number.
  */
-const RELIABILITY_POINTS: ReadonlyArray<{ readonly tag: string; readonly name: string; readonly body: string }> = [
+const RELIABILITY_POINTS: ReadonlyArray<
+  { readonly tag: string; readonly name: string; readonly body: string } & CardImage
+> = [
   {
     tag: 'BUILT',
     name: 'Sealed for the site',
     body: 'Enclosures, connectors and drivetrains specified for dust, water and washdown — so a shift in the mud, the rain or the dark is an ordinary day rather than an exception.',
+    image: '/assets/images/tech-reliability-built.webp',
+    alt: 'The Saibya drivetrain: solid field tyres on steel rims under a bolted, sealed chassis enclosure.',
   },
   {
     tag: 'SAFE',
     name: 'Faults stay local',
     body: 'Lose the link, the satellite fix or a sensor and the vehicle falls back to a safe state on its own. The reflex layer holds it there while the layers above recover.',
+    image: '/assets/images/tech-reliability-safe.webp',
+    alt: 'The vehicle control panel: the red emergency stop beside the battery isolator, the fuse bank and a charge gauge.',
   },
   {
     tag: 'FIELD',
     name: 'Serviceable where it works',
     body: 'Attachments come off with standard tooling, and the same core runs on every platform — so a crew trained on one robot can keep the whole fleet moving.',
+    image: '/assets/images/tech-reliability-field-v2.webp',
+    alt: 'An ARNOBOT engineer in a branded polo refitting a drive wheel to a UGV chassis on the bench, the battery pack open on the deck behind.',
   },
 ];
 
@@ -65,12 +95,29 @@ type BandSource =
  * than a black rectangle. `preload="metadata"` keeps the chapter markers from
  * pulling their full payload before the visitor scrolls to them; autoplay
  * fetches the rest when the element actually starts.
+ *
+ * `priority` is for the one band that is above the fold. The hero's still is
+ * the page's largest paint, and an `img` deep in the markup is fetched at
+ * default priority behind whatever the browser found first; the bands below it
+ * stay lazy, since they are a scroll away.
  */
-function BandMedia({ video, image, poster, preload = 'metadata' }: BandSource & { readonly preload?: 'metadata' | 'auto' }) {
+function BandMedia({
+  video,
+  image,
+  poster,
+  preload = 'metadata',
+  priority = false,
+}: BandSource & { readonly preload?: 'metadata' | 'auto'; readonly priority?: boolean }) {
   return (
     <div className={styles.media} aria-hidden="true">
       {image ? (
-        <img src={image} alt="" />
+        <img
+          src={image}
+          alt=""
+          fetchPriority={priority ? 'high' : 'auto'}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+        />
       ) : (
         <video autoPlay muted loop playsInline preload={preload} poster={poster}>
           <source src={video} type="video/mp4" />
@@ -126,9 +173,16 @@ export default function TechnologyPage() {
         data-cinematic-hero
         data-header-theme="dark"
       >
-        {/* The wiring bay of a platform being built, shot close on a gloved
-            hand: the loop runs forward then back, so it never cuts. */}
-        <BandMedia video="/assets/videos/technology-hero.mp4" poster="/assets/images/tech-hero-poster.webp" />
+        {/* A SAIBYA holding a scrub lot on its own — the machine at work, which
+            is what the page goes on to explain, and nothing of how it is built.
+            A still rather than the field loop: the clip's later segments cut in
+            close enough to read hardware off the deck, and an earlier cut opened
+            on a gloved hand in an opened wiring bay. What the platform carries
+            inside is not the site's to publish, and a single frame cannot drift
+            into showing it. The subject sits right of centre, past the copy
+            column, where the scrim leaves the frame open; the slow drift on
+            `.media img` keeps it from reading as a flat backdrop. */}
+        <BandMedia image="/assets/images/tech-hero-field-poster.webp" priority />
         <div className={styles.heroInner}>
           <div className="fade-up">
             <span className="eyebrow">ARNOBOT Technology</span>
@@ -218,9 +272,21 @@ export default function TechnologyPage() {
           <h2 className="section-title is-editorial">Perceive. Localise. Decide.</h2>
           <p className="section-lead">One loop, running onboard — with or without a link to the control room.</p>
         </div>
+        {/* Each step opens on the thing it describes — the sensors, the
+            scanner, the mission drawn on the map — so the loop is shown as
+            well as named. */}
         <ol className={cn('card-grid', 'fade-up', 'd1', styles.steps)}>
           {PERCEPTION_STEPS.map((step, i) => (
             <li className={cn('card-cell', styles.step)} key={step.name}>
+              <img
+                className={styles.stepFigure}
+                src={step.image}
+                alt={step.alt}
+                width={1120}
+                height={630}
+                loading="lazy"
+                decoding="async"
+              />
               <span className={cn('micro-label', styles.stepIndex)}>{String(i + 1).padStart(2, '0')}</span>
               <h3>{step.name}</h3>
               <p>{step.body}</p>
@@ -255,12 +321,19 @@ export default function TechnologyPage() {
               <div className={styles.laptopLid}>
                 <span className={styles.laptopCam} aria-hidden="true" />
                 <div className={styles.laptopScreen}>
+                  {/* The capture runs at desk pace — real time for the operator,
+                      but a slow read on a page nobody stops at. At 1.75x the
+                      dashboard and the mission review both land inside the time
+                      the section holds attention. `videoRate` applies it:
+                      playbackRate is a property, not an attribute, so it cannot
+                      be set from server-rendered markup alone. */}
                   <video
                     autoPlay
                     muted
                     loop
                     playsInline
                     preload="metadata"
+                    data-playback-rate="1.75"
                     poster="/assets/images/gcs-laptop-poster.webp"
                     aria-label="The ARNOBOT Ground Control Station: the live mission dashboard, then a completed mission reviewed afterwards — distance covered, time taken, waypoints reached, and the planned route drawn against the path actually driven."
                   >
@@ -268,6 +341,7 @@ export default function TechnologyPage() {
                   </video>
                 </div>
               </div>
+              <div className={styles.laptopHinge} aria-hidden="true" />
               <div className={styles.laptopBase} aria-hidden="true" />
             </div>
           </figure>
@@ -285,9 +359,22 @@ export default function TechnologyPage() {
             Hardware qualified for the ground it works on, and a control chain that keeps a fault local.
           </p>
         </div>
-        <ul className={cn('card-grid', 'fade-up', 'd1', styles.steps)}>
+        {/* The same figure as the loop above, letterboxed: these three
+            paragraphs are twice as long, and the section still has to land in
+            one screen. Each is the hardware the sentence is about — the sealed
+            drivetrain, the emergency stop, the service panel. */}
+        <ul className={cn('card-grid', 'fade-up', 'd1', styles.steps, styles.stepsWide)}>
           {RELIABILITY_POINTS.map((point) => (
             <li className={cn('card-cell', styles.step)} key={point.name}>
+              <img
+                className={styles.stepFigure}
+                src={point.image}
+                alt={point.alt}
+                width={1120}
+                height={480}
+                loading="lazy"
+                decoding="async"
+              />
               <span className={cn('micro-label', styles.stepIndex)}>{point.tag}</span>
               <h3>{point.name}</h3>
               <p>{point.body}</p>

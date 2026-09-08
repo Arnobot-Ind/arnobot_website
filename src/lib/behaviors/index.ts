@@ -5,6 +5,7 @@ import { marquees } from './marquee';
 import { pageAnimations } from './animations';
 import { closingViewport } from './closingViewport';
 import { legalToc } from './legalToc';
+import { videoRate } from './videoRate';
 
 /**
  * Behaviours that operate on server-rendered markup rather than React state.
@@ -17,6 +18,7 @@ const BEHAVIORS: ReadonlyArray<() => Cleanup> = [
   marquees,
   closingViewport,
   legalToc,
+  videoRate,
 ];
 
 /** Starts every behaviour and returns a single teardown for all of them. */

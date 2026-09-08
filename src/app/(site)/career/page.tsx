@@ -10,7 +10,7 @@ import styles from './career.module.css';
 export const metadata: Metadata = {
   title: 'Careers',
   description:
-    'Build robots. Solve hard problems. Make an impact. Why the work matters, who you would work with, and the open roles in Ahmedabad.',
+    'Build the robots that go where people shouldn’t — why the work matters, who you would work with, and the open roles in Ahmedabad.',
 };
 
 /* ---------------------------------------------------------------------------
@@ -131,19 +131,33 @@ export default function CareerPage() {
         data-cinematic-hero
         data-header-theme="dark"
       >
-        {/* A board being soldered at the bench, the camera easing back; the
-            loop runs forward then back, so it never cuts. The poster is its
-            own first frame, which is what carries the band while the file
-            arrives — so the clip is left on `preload="metadata"` rather than
-            being pulled down whole ahead of the first paint. */}
+        {/* An engineer running the robotic arm from the bench, the arm tracking
+            her hand. Cut from the shoot's own footage, six seconds played
+            forward then reversed onto itself, so the twelve-second loop never
+            cuts — the same treatment the soldering clip it replaces used. That
+            clip was a pair of hands and a board: true to the work but it could
+            have been any electronics bench anywhere. This one has a person, an
+            ARNOBOT machine responding to her, and the badge on the base, which
+            is the thing a careers page is actually selling.
+
+            It suits `.scrim` by luck of framing rather than by crop: the wash
+            is heaviest at the left edge, where this frame has only bench and
+            wall, and both the engineer and the arm sit right of the copy
+            column. The poster is the loop's own first frame, which is what
+            carries the band while the file arrives — so the clip stays on
+            `preload="metadata"` rather than being pulled down whole ahead of
+            the first paint. `careers-workshop.mp4` and its poster are left in
+            place, unreferenced. */}
         <BandMedia
-          video="/assets/videos/careers-workshop.mp4"
-          poster="/assets/images/careers-hero-poster.webp"
+          video="/assets/videos/careers-robotic-arm.mp4"
+          poster="/assets/images/careers-hero-arm-poster.webp"
         />
         <div className={styles.heroInner}>
           <div className="fade-up">
             <span className="eyebrow">Careers at {SITE.name}</span>
-            <h1 className={cn('hero-title', styles.heroTitle)}>Build robots. Solve hard problems. Make an impact.</h1>
+            <h1 className={cn('hero-title', styles.heroTitle)}>
+              Build robots. Solve hard problems. Make an impact.
+            </h1>
             <p className={cn('hero-lead', styles.heroLead)}>
               Join a hands-on robotics team building autonomous platforms for hazardous environments, critical
               infrastructure and defence.
@@ -152,21 +166,47 @@ export default function CareerPage() {
               <Link href="/career/open-positions" className="btn btn-light">
                 See open roles
               </Link>
-              <Link href="/career/open-positions#apply" className="btn btn-outline">
-                Send an open application
+              <Link href="/apply" className="btn btn-outline">
+                Start your application
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2 — Why the work matters, told over a full-bleed frame from the
+      {/* 2 — Facility: the rooms come before the argument now. The hero asks
+          someone to come and build, and the first thing under it is the place
+          they would build in — the four rooms, then why the work is worth
+          doing. It also breaks the two dark full-bleed bands that used to run
+          back to back into the page's alternation: dark hero, light rooms,
+          dark band, light team, dark apply.
+
+          The head sits in the middle like the light sections around it, then
+          the four rooms as a framed carousel inside the measure, sliding one
+          room to the next with only that room's name and note over its slide.
+          `FacilityCarousel` owns the turn. */}
+      <section className={cn('section-screen', 'is-wash', styles.facility, 'reveal')} id="facility">
+        <div className={cn('section-head is-centered', styles.sectionHead, styles.facilityHead, 'fade-up')}>
+          <span className="eyebrow">Facility</span>
+          <h2 className="section-title is-editorial">Built in-house</h2>
+          {/* One line, so the head takes as little of the screen as it can
+              and the pictures take the rest. */}
+          <p className="section-lead">Four rooms in Ahmedabad, where every platform is designed, built and tested.</p>
+        </div>
+
+        <div className={cn(styles.carouselReveal, 'fade-up', 'd1')}>
+          <FacilityCarousel rooms={ROOMS} />
+        </div>
+      </section>
+
+      {/* 3 — Why the work matters, told over a full-bleed frame from the
           ALTIUS ship-hull trial at the Alang recycling yard: the crawler
           working its way up the plate with the two operators stood on the
           ground below it, which is the section's sentence in one picture.
-          The same composition as the hero above and the technology page's
-          chapter bands: one column at the gutter, eyebrow → title → lead,
-          with the hull and the crew holding the clear right of the frame. */}
+          The same composition as the hero and the technology page's chapter
+          bands: one column at the gutter, eyebrow → title → lead, with the
+          hull and the crew holding the clear right of the frame. Coming after
+          the rooms, it reads as what the rooms are for. */}
       <section
         className={cn('on-dark', 'section-screen', styles.why, 'reveal')}
         id="career-why"
@@ -182,24 +222,6 @@ export default function CareerPage() {
               the real world — dust, water, darkness and bad signal.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* 3 — Facility: the head in the middle like the light sections around
-          it, then the four rooms as a framed carousel inside the measure,
-          sliding one room to the next with only that room's name and note
-          over its slide. `FacilityCarousel` owns the turn. */}
-      <section className={cn('section-screen', 'is-wash', styles.facility, 'reveal')} id="facility">
-        <div className={cn('section-head is-centered', styles.sectionHead, styles.facilityHead, 'fade-up')}>
-          <span className="eyebrow">Facility</span>
-          <h2 className="section-title is-editorial">Built in-house</h2>
-          {/* One line, so the head takes as little of the screen as it can
-              and the pictures take the rest. */}
-          <p className="section-lead">Four rooms in Ahmedabad, where every platform is designed, built and tested.</p>
-        </div>
-
-        <div className={cn(styles.carouselReveal, 'fade-up', 'd1')}>
-          <FacilityCarousel rooms={ROOMS} />
         </div>
       </section>
 
@@ -270,7 +292,7 @@ export default function CareerPage() {
                 </p>
                 <p className={styles.processDetail}>{step.detail}</p>
                 {index === 0 ? (
-                  <Link href="/career/open-positions#apply" className={cn('btn btn-light', styles.processCta)}>
+                  <Link href="/apply" className={cn('btn btn-light', styles.processCta)}>
                     Apply now{' '}
                     <span className="btn-arrow" aria-hidden="true">
                       &rarr;

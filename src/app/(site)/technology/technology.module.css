@@ -104,7 +104,12 @@
   overflow: hidden;
 }
 
-.hero .media video {
+/* The hero sits a stop darker than the chapter markers — the title is the
+   largest type on the page and carries the most words over the picture.
+   Applies to the still as well as to a clip: the hero is a photograph now, and
+   without the `img` half it would come back 0.9 and wash the title out. */
+.hero .media video,
+.hero .media img {
   opacity: 0.72;
 }
 
@@ -185,9 +190,14 @@
    Copy on the left, the GCS on a laptop on the right: the same two-column split
    as the Origin section on About, held to the content measure like the card
    grids above it. The laptop is drawn here in CSS rather than photographed —
-   it stays sharp at every width, costs a few hundred bytes instead of a
-   multi-megabyte clip, and takes its greys from `--ink` so it belongs to the
-   same palette as the rest of the page.
+   it stays sharp at every width and costs a few hundred bytes instead of a
+   multi-megabyte clip.
+
+   It is a silver machine, so unlike the rest of the page it does not take its
+   greys from `--ink`: aluminium is a warmer, lighter neutral than the brand
+   ink, and tinting it toward `--ink` reads as grey plastic. The `--alu-*`
+   ramp below is the machine's own, and is the only place on the page that
+   departs from the palette.
    -------------------------------------------------------------------------- */
 
 .showcaseSplit {
@@ -213,53 +223,108 @@
   min-width: 0;
 }
 
-/* The laptop. Held under the copy's own comfortable reading width so the
-   machine never outgrows the sentence it illustrates.
+/* The laptop — a silver MacBook, drawn in CSS. Held under the copy's own
+   comfortable reading width so the machine never outgrows the sentence it
+   illustrates.
 
-   Every part of it is derived from one bezel measure, so the machine keeps its
-   proportions as the column narrows: a fixed 12px bezel is 1.5% of the lid at
-   full width but over 3% of it on a phone, which reads as a picture frame
-   rather than a laptop. */
+   Two fluid measures do the work, so the machine keeps its proportions as the
+   column narrows: `--rim` is the aluminium edge visible around the lid, and
+   `--bezel` the black band between that edge and the picture. A fixed 12px
+   bezel is 1.5% of the lid at full width but over 3% of it on a phone, which
+   reads as a picture frame rather than a laptop.
+
+   The greys are the machine's own aluminium rather than the page's `--ink`:
+   lit from above, so each surface is brightest where it faces the light and
+   darkest where it turns away. */
 .laptop {
-  --bezel: clamp(7px, 1.2vw, 12px);
+  --rim: clamp(2px, 0.3vw, 4px);
+  --bezel: clamp(6px, 1vw, 10px);
+  --alu-hi: #f6f7f8;
+  --alu-lo: #e2e5e9;
+  --alu-mid: #ced2d8;
+  --alu-edge: #b3b9c0;
+  --alu-dark: #99a0a8;
+  /* The glass, and the bezel around it — near-black, faintly blue, never a
+     flat #000 that would look like a hole punched in the page. */
+  --glass: #0b0d12;
   width: 100%;
   max-width: 820px;
   margin-inline: auto;
 }
 
-/* The lid: a bezel around the screen, squarer at the bottom where it meets
-   the hinge than at the top two corners. */
+/* The lid: an aluminium edge around the screen, squarer at the bottom where it
+   meets the hinge than at the top two corners.
+
+   Anodised aluminium is not a flat grey — it is a curved surface picking up a
+   bright line where it faces the light and going dark where it rolls away. The
+   vertical gradient does the top-to-bottom fall; the horizontal one darkens
+   both outer edges so the lid reads as a panel with thickness rather than a
+   rectangle of paint. The inset hairline keeps the silver off a white
+   background, where a drop shadow alone leaves the top edge undefined. */
 .laptopLid {
   position: relative;
-  padding: var(--bezel) var(--bezel) calc(var(--bezel) * 1.35);
+  padding: var(--rim);
   border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xs) var(--radius-xs);
-  background: linear-gradient(180deg, rgba(var(--ink-rgb), 0.94), var(--ink));
-  box-shadow: var(--shadow-card);
+  background:
+    linear-gradient(
+      90deg,
+      var(--alu-edge) 0,
+      var(--alu-lo) 1.6%,
+      transparent 5%,
+      transparent 95%,
+      var(--alu-lo) 98.4%,
+      var(--alu-edge) 100%
+    ),
+    linear-gradient(180deg, #fbfcfc 0, var(--alu-hi) 2%, var(--alu-lo) 46%, var(--alu-mid) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--ink-rgb), 0.16),
+    var(--shadow-card);
 }
 
-/* The camera, centred in the top bezel — the one detail that reads the shape
-   as a laptop rather than a framed screenshot. */
+/* The camera, centred in the black bezel above the picture — the one detail
+   that reads the shape as a laptop rather than a framed screenshot. Sat on the
+   bezel's own centre line, half the rim plus half the band down. */
 .laptopCam {
   position: absolute;
-  /* A third of the bezel across — which also centres it, since half the
-     band left over is that same third. */
-  top: calc(var(--bezel) / 3);
+  z-index: 1;
+  top: calc(var(--rim) + var(--bezel) / 2);
   left: 50%;
-  width: calc(var(--bezel) / 3);
-  height: calc(var(--bezel) / 3);
-  transform: translateX(-50%);
+  width: clamp(2px, 0.26vw, 3.5px);
+  height: clamp(2px, 0.26vw, 3.5px);
+  transform: translate(-50%, -50%);
   border-radius: var(--radius-round);
-  background: rgba(var(--white-rgb), 0.22);
+  background: #2b3a4a;
+  box-shadow: 0 0 0 1px rgba(var(--white-rgb), 0.07);
 }
 
+/* The bezel is a border rather than more lid padding, so the aluminium above
+   stays a visible edge instead of being swallowed by the black. Thicker along
+   the bottom, as the chin is on the real machine. */
 .laptopScreen {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-xs);
-  background: var(--ink);
+  border: var(--bezel) solid var(--glass);
+  border-bottom-width: calc(var(--bezel) * 1.3);
+  border-radius: calc(var(--radius-xs) + 2px);
+  background: var(--glass);
   /* The GCS captures are 1440x900. Declared up front so the section does not
      reflow when the image lands. */
   aspect-ratio: 16 / 10;
+}
+
+/* A single soft diagonal across the glass. Kept under a tenth of full white so
+   it reads as a sheen on the panel without washing out the dashboard beneath
+   it, and out of the way of the pointer. */
+.laptopScreen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    104deg,
+    rgba(var(--white-rgb), 0.075) 0 24%,
+    rgba(var(--white-rgb), 0) 46%
+  );
 }
 
 /* Either fills the well identically, so a screen recording can replace the
@@ -272,28 +337,88 @@
   object-fit: cover;
 }
 
-/* The base overhangs the lid on both sides, as a real one does, and carries
-   the thumb notch in the middle of its front edge. */
-.laptopBase {
+/* The hinge: the dark gap under the lid where it meets the deck. Narrower than
+   the base and sat between the two, it is what stops the lid and the base
+   reading as one flat slab — on the real machine you see straight through to
+   the shadow behind. */
+.laptopHinge {
   position: relative;
-  height: calc(var(--bezel) * 1.1);
-  margin-inline: -3.5%;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  /* Lit along its top edge where it catches the light, dark underneath. */
-  background: linear-gradient(180deg, rgba(var(--ink-rgb), 0.86) 0 40%, var(--ink) 40%);
-  box-shadow: 0 18px 32px rgba(var(--ink-rgb), 0.16);
+  height: calc(var(--bezel) * 0.34);
+  margin-inline: 2.5%;
+  border-radius: 0 0 var(--radius-xs) var(--radius-xs);
+  background: linear-gradient(180deg, #6f767f 0, #4a5058 55%, #3a3f47 100%);
 }
 
+/* The base overhangs the lid on both sides, as a real one does, and carries
+   the thumb notch in the middle of its front edge. Front-on this is the only
+   broad face of aluminium in view, so it carries most of the silver.
+
+   The bands are the edge turning through the light: the shadow the lid throws
+   onto the deck, the bright crown just below it, then the face falling away to
+   a dark underside. The horizontal gradient rolls both ends off, so the slab
+   ends in rounded metal rather than a cut edge — front-on, that curvature is
+   most of what separates a laptop from a rectangle. */
+.laptopBase {
+  position: relative;
+  height: calc(var(--bezel) * 1.2);
+  margin-inline: -3.4%;
+  border-radius: 0 0 calc(var(--radius-md) + 6px) calc(var(--radius-md) + 6px);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(var(--ink-rgb), 0.22) 0,
+      rgba(var(--ink-rgb), 0.06) 1.2%,
+      transparent 4%,
+      transparent 96%,
+      rgba(var(--ink-rgb), 0.06) 98.8%,
+      rgba(var(--ink-rgb), 0.22) 100%
+    ),
+    linear-gradient(
+      180deg,
+      var(--alu-dark) 0 6%,
+      #fdfdfe 6% 13%,
+      var(--alu-hi) 13% 34%,
+      var(--alu-lo) 34% 62%,
+      var(--alu-mid) 62% 84%,
+      var(--alu-edge) 84% 95%,
+      var(--alu-dark) 95%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--ink-rgb), 0.13),
+    0 26px 34px -14px rgba(var(--ink-rgb), 0.3);
+}
+
+/* The contact shadow. The card shadow on the lid lights the machine but leaves
+   it floating; this is the darker, tighter pool directly under the front edge
+   that sets it down on the surface. Narrower than the base and blurred wide, so
+   it reads as contact rather than a second object. */
+.laptopBase::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 6%;
+  right: 6%;
+  bottom: -6px;
+  height: 14px;
+  border-radius: var(--radius-round);
+  background: rgba(var(--ink-rgb), 0.26);
+  filter: blur(9px);
+}
+
+/* The thumb scoop: the shallow dish milled into the front edge so a finger can
+   get under the lid. Wide and shallow, and darker than the face around it —
+   it has to read as metal turning away into a recess, not as a tab stuck onto
+   the front. */
 .laptopBase::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  top: 7%;
   left: 50%;
-  width: 13%;
-  height: calc(var(--bezel) / 3);
+  width: 15%;
+  height: 42%;
   transform: translateX(-50%);
-  border-radius: 0 0 var(--radius-xs) var(--radius-xs);
-  background: rgba(var(--white-rgb), 0.14);
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(180deg, var(--alu-dark), var(--alu-edge) 70%, var(--alu-mid));
 }
 
 /* One column on a phone: the copy first, the machine under it. */
@@ -306,8 +431,8 @@
 /* --------------------------------------------------------------------------
    Perceive / Localise / Decide — and the same rhythm for Robust & Reliable.
 
-   Both are the global `card-grid` / `card-cell`; the tracks, the measure and
-   the staggered reveal are the page's own.
+   Both are the global `card-grid` / `card-cell`; the tracks, the measure, the
+   picture at the top of each cell and the staggered reveal are the page's own.
    -------------------------------------------------------------------------- */
 
 .steps {
@@ -343,6 +468,33 @@
 
 :global(.visible) .step:nth-child(3) {
   transition-delay: 0.24s;
+}
+
+/* The picture that opens each cell — the sensor, the switch, the map the
+   sentence under it is about. Same frame as the media on an insights card:
+   rounded to `--radius-card`, cropped to fill, on the deeper surface tint so a
+   slow connection shows a block of the page's own grey rather than a hole.
+
+   Held inside the cell's padding rather than bled to its edges: `card-grid`
+   draws the cells with hairlines and no shadow, and a photograph running into
+   that 1px rule reads as a seam. */
+.stepFigure {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 24px;
+  border-radius: var(--radius-card);
+  /* 16:9 by default; the wide grid below overrides it through the property. */
+  aspect-ratio: var(--step-figure-ratio, 16 / 9);
+  object-fit: cover;
+  background: var(--surface-2);
+}
+
+/* Robust & Reliable: the same figure, letterboxed. Its three paragraphs run to
+   roughly twice the length of the loop's, so the pictures give back the height
+   the copy takes and the section still resolves in one screen. */
+.stepsWide {
+  --step-figure-ratio: 21 / 9;
 }
 
 /* Set as a `micro-label`; the accent is the page's own, because this line is a

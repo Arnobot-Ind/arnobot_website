@@ -601,10 +601,11 @@ a.visitRowValue:focus-visible {
 /* --------------------------------------------------------------------------
    Short desktop viewports.
 
-   Headless probes never render the reCAPTCHA (the API script is injected
-   after load), so the enquiry band measured as fitting 1440x804 while the
-   live 78px widget pushed it 68px past one screen in a real browser. On a
-   desktop that is not tall — 1440x804, 1366x768 — the form's vertical rhythm
+   These allowances were measured when the form still carried a 78px reCAPTCHA
+   widget, which pushed the enquiry band 68px past one screen. The widget is
+   gone, so the band now has that much slack in hand — the trims below are kept
+   because they cost nothing and the form is still the tallest thing on the
+   page. On a desktop that is not tall — 1440x804, 1366x768 — the vertical rhythm
    gives way before the fields do: the row gap, the label gap, the message
    box and the card padding all come in a little. Nothing changes at 1080
    and above, where the band has room to spare, or on phones, which size to
@@ -664,5 +665,23 @@ a.visitRowValue:focus-visible {
 
   .mapFrame iframe {
     transition: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Touch sizing — phones and small tablets only, so the desktop layout above
+   is untouched. Both of these are the sole tappable thing in their row (a
+   phone number, an address, an email in a contact card), so they take the
+   full 44px target rather than the 22-25px their line box gives them.
+   Inline links inside running sentences elsewhere on this page are left
+   alone; padding those would break the line they sit in.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  a.channelValue,
+  a.visitRowValue {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
   }
 }

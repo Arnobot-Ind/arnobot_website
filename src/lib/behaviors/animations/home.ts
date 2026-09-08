@@ -28,6 +28,12 @@ function heroSection(): void {
      itself through CSS (interactions.css) and the reference bar's mark just
      sits; a GSAP `.from` here re-captured a mid-animation opacity on
      re-init and wedged the mark invisible. */
+  /* Every hero's copy is server-rendered markup, which is what this whole
+     layer is for — see the note at the head of src/lib/behaviors/index.ts. A
+     hero whose copy is owned by a React client component cannot be animated
+     from here: the tween applies its from-state, React commits the subtree
+     around it, and the headline stays wedged at opacity 0 with no second
+     chance. Keep it that way, or move the entrance into CSS on the element. */
   timeline.from('.hero-content .eyebrow', { opacity: 0, y: 30, duration: 0.6, ease: 'power3.out' }, '-=0.8');
   timeline.from('.hero h1', { opacity: 0, y: 40, duration: 0.8, ease: 'power3.out' }, '-=0.6');
 

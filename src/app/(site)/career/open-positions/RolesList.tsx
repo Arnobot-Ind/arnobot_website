@@ -67,12 +67,11 @@ export default function RolesList() {
       <ul className={styles.roleList}>
         {rows.map(({ job, discipline }) => (
           <li className={styles.role} key={job.slug}>
-            {/* Same page, with the role carried in the query so the form's
-                select opens on it. */}
-            <Link
-              className={styles.roleLink}
-              href={{ pathname: '/career/open-positions', query: { role: job.slug }, hash: 'apply' }}
-            >
+            {/* Every role opens the same screening flow. The role is picked
+                inside it, from the list /api/roles serves out of the database,
+                rather than carried in the query — the postings here and the
+                roles the assessment is built from are two different sets. */}
+            <Link className={styles.roleLink} href="/apply">
               <div>
                 <span className={cn('micro-label', styles.roleDiscipline)}>{discipline}</span>
                 <h3 className={styles.roleTitle}>{job.title}</h3>

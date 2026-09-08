@@ -39,8 +39,24 @@
   height: 100%;
   object-fit: cover;
   opacity: 0.9;
+  /* The machine holds the right of the frame, so bias the cover crop that
+     way. On a 16:9 viewport there is no horizontal excess and this does
+     nothing; on the 16:10 and 3:2 laptops that crop about 5% off each side it
+     takes that off the left, where the frame is only foliage, instead of off
+     the rear wheels. */
+  object-position: 68% center;
   /* A slow drift keeps a short loop from reading as a still frame. */
   animation: drift 24s ease-in-out infinite alternate;
+}
+
+/* Phones crop the 16:9 frame down to a strip about a quarter of its width, so
+   the centre of the picture is foliage and the machine is off the edge. Move
+   the strip over it. */
+@media (max-width: 700px) {
+  .media video,
+  .media img {
+    object-position: 76% center;
+  }
 }
 
 @keyframes drift {
@@ -260,8 +276,9 @@
    white; `on-dark` in the markup carries the white type.
    -------------------------------------------------------------------------- */
 
+/* The ground comes from the global `is-wash`, the same one the mission screen
+   uses — this only drops the closing hairline, since the CTA band follows. */
 .valuesSection:global(.section-screen) {
-  background: var(--ink);
   border-bottom: 0;
 }
 
@@ -270,6 +287,31 @@
   max-width: var(--measure-narrow);
   margin-inline: auto;
   text-align: center;
+}
+
+/* The standing "Made in India" line under the rotator: the global
+   `micro-label`, laid out as a row so the mark sits on the cap height of the
+   words rather than above them. Compound with the global so the display and
+   the colour win whichever stylesheet lands first. */
+.origin:global(.micro-label) {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: clamp(32px, 5vh, 56px);
+  color: var(--slate-600);
+}
+
+/* The Make in India artwork is dark line work with its wordmark knocked out of
+   the lion. The band is now the same light wash as the mission screen, so the
+   mark sits straight on it — the white chip it needed over the old dark ground
+   is gone. It is never recoloured: a government mark is not ours to restyle.
+
+   Drawn 20% larger than it first shipped — clamp(34px, 4.4vh, 46px) scaled
+   through. */
+.originMark {
+  flex: none;
+  width: auto;
+  height: clamp(41px, 5.28vh, 55px);
 }
 
 /* --------------------------------------------------------------------------

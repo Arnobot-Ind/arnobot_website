@@ -36,7 +36,8 @@ export interface NavLink {
 export const PRIMARY_NAV: readonly NavLink[] = [
   { href: '/technology', label: 'TECHNOLOGY', mobileLabel: 'Technology' },
   { href: '/about', label: 'COMPANY', mobileLabel: 'Company' },
-  { href: '/insights', label: 'INSIGHTS', mobileLabel: 'Insights' },
+  // Insights is unpublished while its articles are rewritten — see `@/lib/flags`.
+  // { href: '/insights', label: 'INSIGHTS', mobileLabel: 'Insights' },
 ];
 
 export const SECONDARY_NAV: readonly NavLink[] = [
@@ -71,7 +72,8 @@ export const FOOTER_NAV: ReadonlyArray<{
       { href: '/about', label: 'About' },
       { href: '/technology', label: 'Technology' },
       { href: '/career', label: 'Careers' },
-      { href: '/insights', label: 'Insights' },
+      // Unpublished with the rest of the section — see `@/lib/flags`.
+      // { href: '/insights', label: 'Insights' },
     ],
   },
   {

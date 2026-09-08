@@ -207,8 +207,8 @@ export function RocketIcon(props: IconProps) {
   );
 }
 
-/** Shield and check — the principles held to. */
-/** Lightbulb — an idea protected: the IP filings on the record. */
+/** Lightbulb — an idea. Unused since `ShieldIdeaIcon` took the "IPs filed"
+    slot on the company page; kept as part of the icon set rather than deleted. */
 export function LightbulbIcon(props: IconProps) {
   return (
     <Icon strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -245,5 +245,101 @@ export function RoverIcon(props: IconProps) {
       <rect x="12" y="2" width="5" height="2.5" rx="0.6" />
       <path d="M6.5 9.5V7" />
     </Icon>
+  );
+}
+
+/** Television — a set with its aerial up: media coverage, marking "Spotlight"
+    on the company page's record band.
+    `NewspaperIcon` held that slot first and reads fine alone, but not in that
+    band — it sat two columns from `FileTextIcon`, and a ruled sheet beside a
+    ruled sheet is one silhouette twice at 40px. A broadcast-wave mark was tried
+    next and was too abstract; it read as a wireless signal rather than as
+    media. This is the literal object, which is what the band needed.
+    The aerials stop short of the box so the three strokes stay separate at
+    40px; the band forces `stroke-width: 2` over the 1.75 set here. */
+export function TelevisionIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="2.5" y="9" width="19" height="12" rx="2" />
+      <path d="M9 9 5.5 4.5" />
+      <path d="M15 9l3.5-4.5" />
+    </Icon>
+  );
+}
+
+/** A shield with an idea held inside it — an IP filing, which is protection
+    bought for an invention rather than the invention itself. It marks "IPs
+    filed" on the company page's record band.
+    `LightbulbIcon` held that slot and said "idea", which is the thing before
+    the filing, not the filing. A certificate seal was the other candidate and
+    was passed over: it reads as "awarded", which is the trophy two columns
+    along. The shield shares its silhouette with nothing else in the band.
+
+    The bulb inside it is drawn to survive the band, which renders 24-unit
+    glyphs at 40px and forces `stroke-width: 2` — a stroke landing over 3px
+    wide, so any two lines closer than about 2 units merge. The first drawing
+    outlined the glass, neck and base as one continuous contour and the whole
+    thing closed up into a dot at that size. It is now three separate marks
+    with clear air between them: the glass as a plain circle at the largest
+    radius the shield will hold, then two short rules for the screw base. The
+    rules are what keep it a bulb — with the circle alone the shield reads as
+    a padlock. */
+export function ShieldIdeaIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 2.4 4.6 5.3v6.1c0 4.3 3.1 7.5 7.4 8.9 4.3-1.4 7.4-4.6 7.4-8.9V5.3Z" />
+      <circle cx="12" cy="9.9" r="3.1" />
+      <path d="M10.6 14.2h2.8" />
+      <path d="M11 16.3h2" />
+    </Icon>
+  );
+}
+
+/** Newspaper — a folded sheet with a column of type and the roll behind it:
+    press coverage, as against the page of a publication `FileTextIcon` marks.
+    Unused since `TelevisionIcon` took the Spotlight slot; kept as part of the
+    icon set rather than deleted. */
+export function NewspaperIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M4 5h13a1 1 0 0 1 1 1v13H6a2 2 0 0 1-2-2Z" />
+      <path d="M18 8.5h1.5A1.5 1.5 0 0 1 21 10v7a2 2 0 0 1-2 2h-1" />
+      <path d="M7.5 8.5h6" />
+      <path d="M7.5 12h6" />
+      <path d="M7.5 15.5h4" />
+    </Icon>
+  );
+}
+
+/**
+ * "Made in India" — ARNOBOT's own three-bar mark, the stack of skewed
+ * parallelograms from the wordmark at public/assets/logos/logotm.png, set in
+ * the national colours: saffron, the ground colour, and India green.
+ *
+ * It is deliberately NOT the Government of India "Make in India" lion, which
+ * is a GoI mark carrying usage conditions, and deliberately not any reading of
+ * the State Emblem, whose use is restricted by the State Emblem of India
+ * (Prohibition of Improper Use) Act 2005. This one is the company's own
+ * artwork, so it can ship without anybody's permission. See the note in
+ * about/page.tsx where it is used.
+ *
+ * The middle bar takes `currentColor`, so the mark sits on a dark band or a
+ * light one without a second version.
+ */
+export function MadeInIndiaMark({ size = 26, ...props }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={(size * 22) / 30}
+      viewBox="0 0 30 22"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <path fill="#FF9933" d="M14 0h16l-6 6H8Z" />
+      <path fill="currentColor" d="M10 8h16l-6 6H4Z" />
+      <path fill="#138808" d="M6 16h16l-6 6H0Z" />
+    </svg>
   );
 }

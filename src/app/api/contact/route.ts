@@ -5,40 +5,8 @@ import { field, hasAll, isValidEmail } from '@/lib/validation';
 
 export const runtime = 'nodejs';
 
-/**
- * Pairs with the client's development fallback: when the widget renders with
- * Google's test site key, only the matching test secret will verify its token.
- * Never used in production — there, a missing RECAPTCHA_SECRET_KEY still means
- * "nothing to verify against", exactly as before.
- *
- * https://developers.google.com/recaptcha/docs/faq#localhost
- */
-const GOOGLE_TEST_SECRET = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe';
-
-const RECAPTCHA_SECRET =
-  process.env.RECAPTCHA_SECRET_KEY ?? (process.env.NODE_ENV === 'development' ? GOOGLE_TEST_SECRET : undefined);
-const VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
-const VERIFY_TIMEOUT_MS = 15_000;
-
 function back(request: Request, query: string): NextResponse {
   return NextResponse.redirect(new URL(`/contact${query}`, request.url), 303);
-}
-
-async function verifyRecaptcha(token: string, remoteIp: string): Promise<boolean> {
-  if (!RECAPTCHA_SECRET) return true; // Nothing to verify against; the token check above still applies.
-
-  try {
-    const response = await fetch(VERIFY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ secret: RECAPTCHA_SECRET, response: token, remoteip: remoteIp }),
-      signal: AbortSignal.timeout(VERIFY_TIMEOUT_MS),
-    });
-    const data: unknown = await response.json();
-    return typeof data === 'object' && data !== null && (data as { success?: boolean }).success === true;
-  } catch {
-    return false;
-  }
 }
 
 /** Port of contact_submit.php */
@@ -71,12 +39,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     return back(request, '?error=email');
   }
 
-  const token = field(formData, 'g-recaptcha-response');
-  if (!token) return back(request, '?error=captcha');
+  /* The honeypot. `website` is off-screen and aria-hidden in the form, so only
+     a bot filling every field will have set it. Answer exactly as a success
+     would, and send nothing — telling a spammer which check caught them is how
+     they tune around it.
 
-  const remoteIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
-  if (!(await verifyRecaptcha(token, remoteIp))) {
-    return back(request, '?error=captcha');
+     This replaced reCAPTCHA, whose site key was registered to `arnobot.in`
+     alone and so failed closed on every other deploy host. */
+  if (field(formData, 'website')) {
+    return back(request, '?success=1');
   }
 
   try {

@@ -123,8 +123,14 @@ export default function WordRotate({
       aria-live="polite"
     >
       {/* Structural styles are inline so the words stack even before the
-          stylesheet arrives; style.css adds the slide animations. */}
-      <span className="word-rotate-sizer" style={{ visibility: 'hidden', whiteSpace: 'nowrap' }} aria-hidden="true">
+          stylesheet arrives; style.css adds the slide animations.
+
+          `white-space` is deliberately NOT inline. It is declared on these
+          same classes in style.css, and an inline copy would outrank the
+          stylesheet — which is what stopped the longest value from wrapping on
+          a 320px screen, where "Client-Centric Innovation" is wider than the
+          viewport. Keep it in CSS so the narrow-screen rule can release it. */}
+      <span className="word-rotate-sizer" style={{ visibility: 'hidden' }} aria-hidden="true">
         {longest}
       </span>
       {/* The live region announces each word whole and once; the animated
@@ -134,7 +140,7 @@ export default function WordRotate({
       {previous !== null ? (
         <span
           className="word-rotate-word is-leaving"
-          style={{ position: 'absolute', inset: 0, whiteSpace: 'nowrap' }}
+          style={{ position: 'absolute', inset: 0 }}
           key={`out-${state.previous}-${state.index}`}
           aria-hidden="true"
           onAnimationEnd={() => setState((s) => ({ ...s, previous: null }))}
@@ -144,7 +150,7 @@ export default function WordRotate({
       ) : null}
       <span
         className="word-rotate-word is-entering"
-        style={{ position: 'absolute', inset: 0, whiteSpace: 'nowrap' }}
+        style={{ position: 'absolute', inset: 0 }}
         key={`in-${state.index}`}
         aria-hidden="true"
       >

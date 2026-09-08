@@ -3,7 +3,9 @@ import typescript from 'eslint-config-next/typescript';
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
-  { ignores: ['.next/**', 'node_modules/**', 'public/**', 'next-env.d.ts'] },
+  // Globbed with a leading **/ so build output nested under stray directories
+  // (an old web/ tree still sits here untracked) is ignored too, not just the root.
+  { ignores: ['**/.next/**', '**/node_modules/**', 'public/**', 'next-env.d.ts'] },
   ...coreWebVitals,
   ...typescript,
   {

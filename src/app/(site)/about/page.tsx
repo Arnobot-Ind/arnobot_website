@@ -2,7 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import Cta from '@/components/sections/Cta';
-import { FileTextIcon, LightbulbIcon, RocketIcon, RoverIcon, TargetIcon, TrophyIcon } from '@/components/ui/Icons';
+import {
+  FileTextIcon,
+  RocketIcon,
+  ShieldIdeaIcon,
+  TargetIcon,
+  TelevisionIcon,
+  TrophyIcon,
+} from '@/components/ui/Icons';
 import TypingAnimation from '@/components/ui/TypingAnimation';
 import WordRotate from '@/components/ui/WordRotate';
 import { cn } from '@/lib/dom';
@@ -20,9 +27,19 @@ export const metadata: Metadata = {
 
 /**
  * The record, in the company's own published figures. This band is the only
- * place the site states the awards, filings and publication, and the platform
- * count matches the four on the products page. Each figure is a bare number
- * under a large tinted mark: the label is the only line beneath it.
+ * place the site states the awards, filings, press and publications. Each
+ * figure is a bare number under a large tinted mark: the label is the only
+ * line beneath it.
+ *
+ * These four, in this order, are the set the company asked for, and the
+ * platform count that used to open the band is gone with them: the products
+ * page already states it, and the band now reads as one thing — the outside
+ * record — rather than a product count followed by three distinctions. Four
+ * also keeps the row on the four columns `.stats` is built for.
+ *
+ * Treat the numbers as published copy, not decoration. They are the company's
+ * claim to make, and they are stated here as given; the internal papers count
+ * some of them differently.
  */
 const RECORD: ReadonlyArray<{
   readonly icon: ReactNode;
@@ -30,24 +47,30 @@ const RECORD: ReadonlyArray<{
   readonly label: string;
 }> = [
   {
-    icon: <RoverIcon />,
-    value: '4',
-    label: 'Robotic platforms',
-  },
-  {
     icon: <TrophyIcon />,
     value: '2',
     label: 'Awards',
   },
   {
-    icon: <LightbulbIcon />,
+    /* A filing is protection bought for an invention, so the mark is a shield
+       holding an idea rather than the lightbulb that was here — the bulb said
+       "idea", which is the thing before the filing. */
+    icon: <ShieldIdeaIcon />,
     value: '4',
     label: 'IPs filed',
   },
   {
-    icon: <FileTextIcon />,
+    /* Media coverage, so a television rather than a newspaper: the newspaper
+       sat two columns from `FileTextIcon` and the two read as the same ruled
+       sheet at 40px. */
+    icon: <TelevisionIcon />,
     value: '1',
-    label: 'Publication',
+    label: 'Spotlight',
+  },
+  {
+    icon: <FileTextIcon />,
+    value: '2',
+    label: 'Publications',
   },
 ];
 
@@ -94,12 +117,30 @@ const VALUES = [
    -------------------------------------------------------------------------- */
 
 /**
- * The hero band: the team around a SAIBYA chassis in the Ahmedabad studio.
- * `.media img` holds it at 0.9 opacity under the 24s `drift`, and `.scrim`
- * weights the wash to the left where the copy sits, so the frame keeps its
- * open right-hand side.
+ * The hero band: a SAIBYA Max standing on open ground against a bright
+ * treeline, mast up and beacon on, shot from ground level.
+ *
+ * Every constraint here is set by `.scrim` and `.media img` in the module CSS,
+ * and a replacement frame has to satisfy all of them:
+ *
+ *  - `.scrim` washes 0.86 at the left edge down to 0 at the right, so the
+ *    machine has to sit right of centre or it goes under the wash and
+ *    disappears — the dark-on-dark failure the hero brief raised against the
+ *    old `abt-hero.png`. This frame holds it from about 60% to 87%, inside the
+ *    band `object-position: 68%` is aimed at.
+ *  - The backing has to be bright, not a wall in shade, because the image runs
+ *    at 0.9 opacity under that wash and a black machine needs something behind
+ *    it to cut against. Here it is open sky and a sunlit treeline.
+ *  - `.media img` runs the 24s `drift`, which at full scale crops about 7% off
+ *    the left, 4% off the right and 6% off the top and bottom. The machine and
+ *    its beacon are inside that on every edge.
+ *
+ * The previous frame met all three but was shot long, with the machine small
+ * and the background thrown out of focus, so the band read as a snapshot
+ * rather than as the opening statement of the company page. This one is from
+ * the same field trial, closer and level with the ground.
  */
-const HERO_BAND = '/assets/images/about-band.webp';
+const HERO_BAND = '/assets/images/about-band-saibya-v2.webp';
 
 /** Decorative background behind the hero, under the scrim the copy sits on. */
 function BandMedia({ image }: { readonly image: string }) {
@@ -199,12 +240,43 @@ export default function AboutPage() {
         </section>
       ))}
 
-      {/* Values */}
-      <section className={cn('on-dark', 'section-screen', styles.valuesSection, 'reveal')} id="values" data-header-theme="dark">
+      {/* Values. The same light wash the mission statement sits on, so the
+          three statement screens — mission, vision, values — read as one run
+          rather than the last one arriving as a dark band. `is-wash` is the
+          global that paints it, and with the ground light the section no
+          longer declares a dark header theme: the header probes what is under
+          it and draws in ink by itself. */}
+      <section className={cn('section-screen', 'is-wash', styles.valuesSection, 'reveal')} id="values">
         <div className={cn(styles.values, 'fade-up')}>
           <span className="eyebrow">Our Values</span>
           <p className="value-current is-display">
             <WordRotate words={VALUES} typing />
+          </p>
+          {/* The last value in the rotation is "Made in India", and it is the
+              one the band should still be saying when the rotation has moved
+              on — so the mark is a standing line under the rotator rather than
+              anything hung off it. WordRotate keeps its own absolutely
+              positioned words inside a sizer, so a sibling beneath it cannot
+              disturb the cycle.
+
+              This is the Government of India "Make in India" lion, taken
+              unaltered from makeinindia.com. It carries its own wordmark
+              knocked out of the lion's body, so the image is the whole lockup
+              and no text sits beside it. It is dark line work, and now that the
+              band is light it sits straight on the wash — the white chip it
+              needed over the old dark ground is gone. It is never recoloured;
+              a government mark is not ours to restyle.
+
+              Usage of this mark is conditional on DPIIT permission — that is a
+              business matter, not a technical one. */}
+          <p className={cn('micro-label', styles.origin)}>
+            <img
+              className={styles.originMark}
+              src="/assets/logos/make-in-india.png"
+              alt="Make in India"
+              width={122}
+              height={57}
+            />
           </p>
         </div>
       </section>
@@ -235,9 +307,18 @@ export default function AboutPage() {
             </div>
 
             <div className={cn(styles.signatory, 'fade-up', 'd1')}>
-              {/* Native 4:3, so `object-position` on `.portrait` is a no-op
-                  here and the frame lands as it was cropped. */}
-              <img className={styles.portrait} src="/assets/images/ceo.webp" alt="Anmol Shah" />
+              {/* The founder at the bench with the ARNOBOT arm and a UGV, from
+                  the team shoot. It replaces a crop of an awards-stage
+                  photograph, which put a wall of other companies' sponsor
+                  logos and a stranger's arm behind the man signing the letter
+                  — the same fault the hero brief raised about using an award
+                  photo where a portrait belongs.
+
+                  Native 4:3, so `object-position` on `.portrait` is a no-op
+                  here and the frame lands as it was cropped; it comes back
+                  only on short viewports, where the cap crops the picture and
+                  26% holds the head. */}
+              <img className={styles.portrait} src="/assets/images/founder-anmol-shah.webp" alt="Anmol Shah" />
               <div className={styles.signatoryMeta}>
                 <img className={styles.signature} src="/assets/images/sign1.png" alt="Anmol Shah signature" />
                 <h3 className={styles.signatoryName}>Anmol Shah</h3>

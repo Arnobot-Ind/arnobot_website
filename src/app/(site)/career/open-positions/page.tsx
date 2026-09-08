@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { Fragment } from 'react';
 import Link from 'next/link';
-import CareerForm from '@/components/forms/CareerForm';
-import FormAlert from '@/components/forms/FormAlert';
 import { CheckCircleIcon, MailIcon, PhoneIcon, PinIcon } from '@/components/ui/Icons';
 import { ROLE_COUNT, ROLE_GROUPS } from '@/data/careers';
 import { HQ_ADDRESS_LINES, SITE } from '@/data/site';
@@ -15,14 +13,6 @@ export const metadata: Metadata = {
   description: `${ROLE_COUNT} open roles on the ARNOBOT engineering team in Ahmedabad — hardware, autonomy, research and commercial.`,
 };
 
-interface PageProps {
-  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
-}
-
-function first(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
-
 /** The still behind the hero — the assembly floor, the people the reader would join. */
 const HERO_IMAGE = '/assets/images/designassmbly.webp';
 
@@ -30,15 +20,11 @@ const HERO_IMAGE = '/assets/images/designassmbly.webp';
  * /career/open-positions — the application half of the careers section.
  *
  * The culture page (/career) makes the case and walks through the four
- * hiring steps; this page lists the roles behind one discipline filter and
- * holds the form. A role's Apply link comes back to this page with
- * `?role=<slug>#apply`, which preselects it.
+ * hiring steps; this page lists the roles behind one discipline filter. Every
+ * Apply link hands off to /apply, the screening assistant that takes the
+ * resume and the assessment in one pass.
  */
-export default async function OpenPositionsPage({ searchParams }: PageProps) {
-  const { success, error, role } = await searchParams;
-  const applied = success !== undefined;
-  const preselected = first(role);
-
+export default function OpenPositionsPage() {
   return (
     <main className={styles.page}>
       {/* 1 — Hero: a full screen over a still from the assembly floor, the
@@ -60,7 +46,7 @@ export default async function OpenPositionsPage({ searchParams }: PageProps) {
             <span className="eyebrow">Open roles</span>
             <h1 className={cn('hero-title', styles.heroTitle)}>{ROLE_COUNT} positions open</h1>
             <p className={cn('hero-lead', styles.heroLead)}>
-              All based at the Ahmedabad workshop, where the robots are. Pick the one that fits and the form below will
+              All based at the Ahmedabad workshop, where the robots are. Pick the one that fits and the assessment will
               take it from there.
             </p>
             <ul className={cn('meta-line', styles.heroMeta)}>
@@ -132,29 +118,27 @@ export default async function OpenPositionsPage({ searchParams }: PageProps) {
             </div>
           </div>
 
-          {/* The form is replaced by the receipt once /api/career redirects back
-              with ?success=1 — the two never need to be on screen together. */}
+          {/* Applications run through the screening assistant on /apply rather
+              than a form here: it takes the resume, reads the details off it,
+              and puts a short technical assessment in front of the candidate in
+              one pass. What used to be a mail-out is now a row in the database
+              the team reviews on /admin. */}
           <div className={cn(styles.formShell, 'fade-up', 'd1')}>
-            {applied ? (
-              <div className={styles.successPanel} role="status" aria-live="polite">
-                <div className={styles.successIcon}>
-                  <CheckCircleIcon size={56} strokeWidth="1.5" />
-                </div>
-                <h3 className={cn('section-title is-editorial', styles.successTitle)}>Application received</h3>
-                <p className={cn('section-lead', styles.successBody)}>
-                  Thank you for applying to {SITE.name}. Your details and resume are with the team — we will come back
-                  to you within five business days.
-                </p>
-                <Link href="/career" className="btn btn-accent">
-                  Back to careers
-                </Link>
+            <div className={styles.successPanel}>
+              <div className={styles.successIcon}>
+                <CheckCircleIcon size={56} strokeWidth="1.5" />
               </div>
-            ) : (
-              <>
-                <FormAlert error={error} />
-                <CareerForm defaultRole={preselected} />
-              </>
-            )}
+              <h3 className={cn('section-title is-editorial', styles.successTitle)}>
+                One application, start to finish
+              </h3>
+              <p className={cn('section-lead', styles.successBody)}>
+                Upload your resume and {SITE.name} reads your details off it — you confirm them, pick the role you are
+                going for, and take a short technical assessment in the same sitting. Around twenty minutes end to end.
+              </p>
+              <Link href="/apply" className="btn btn-accent">
+                Start your application
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react';
 
 const ERROR_MESSAGES: Readonly<Record<string, { readonly title: string; readonly body: string }>> = {
-  captcha: {
-    title: 'Verification Required',
-    body: 'Please complete the reCAPTCHA verification and try again.',
-  },
+  // No `captcha` entry: the contact form no longer carries a reCAPTCHA, so
+  // nothing can redirect back with `?error=captcha`. An old link that still
+  // carries it falls through to FALLBACK_ERROR.
   required: { title: 'Required Fields Missing', body: 'Please fill in all required fields.' },
   email: { title: 'Invalid Email Address', body: 'Please enter a valid email address.' },
   // Returned by /api/career only — the resume is the one field the browser
