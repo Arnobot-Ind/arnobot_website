@@ -31,6 +31,9 @@
 */
 @source '../components/quiz/**/*.{ts,tsx}';
 @source './(quiz)/**/*.{ts,tsx}';
+/* The repair-quotation desk loads this same sheet — see (quotation)/layout.tsx —
+   so its classes have to be scanned here too, or they are never emitted. */
+@source './(quotation)/**/*.{ts,tsx}';
 
 /*
   The ARNOBOT light design system for the hiring assistant, carried over from
