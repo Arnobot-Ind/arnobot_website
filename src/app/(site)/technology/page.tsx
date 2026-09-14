@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import Cta from '@/components/sections/Cta';
 import ArchitectureDiagram from '@/components/sections/technology/ArchitectureDiagram';
+import ProductLink from '@/components/ui/ProductLink';
 import { cn } from '@/lib/dom';
 import styles from './technology.module.css';
 
@@ -65,7 +65,7 @@ const RELIABILITY_POINTS: ReadonlyArray<
   {
     tag: 'SAFE',
     name: 'Faults stay local',
-    body: 'Lose the link, the satellite fix or a sensor and the vehicle falls back to a safe state on its own. The reflex layer holds it there while the layers above recover.',
+    body: 'If you lose signal, GPS, or a sensor, the vehicle stops safely on the spot. The low-level safety system holds it still while the software reboots and recovers — no runaway machines, no manual resets.',
     image: '/assets/images/tech-reliability-safe.webp',
     alt: 'The vehicle control panel: the red emergency stop beside the battery isolator, the fuse bank and a charge gauge.',
   },
@@ -207,9 +207,9 @@ export default function TechnologyPage() {
               fully autonomous.
             </p>
           </div>
-          <Link href="/product" className="btn">
+          <ProductLink href="/product" className="btn">
             See how it works
-          </Link>
+          </ProductLink>
         </div>
       </section>
 

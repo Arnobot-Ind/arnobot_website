@@ -10,6 +10,7 @@ import {
   TelevisionIcon,
   TrophyIcon,
 } from '@/components/ui/Icons';
+import ProductLink from '@/components/ui/ProductLink';
 import TypingAnimation from '@/components/ui/TypingAnimation';
 import WordRotate from '@/components/ui/WordRotate';
 import { cn } from '@/lib/dom';
@@ -182,9 +183,9 @@ export default function AboutPage() {
               should not have to go.
             </p>
             <div className={styles.heroActions}>
-              <Link href="/product" className="btn btn-light">
+              <ProductLink href="/product" className="btn btn-light">
                 See the platforms
-              </Link>
+              </ProductLink>
               <Link href="/contact" className="btn btn-outline">
                 Talk to us
               </Link>

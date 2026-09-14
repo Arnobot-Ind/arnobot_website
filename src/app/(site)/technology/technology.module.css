@@ -446,6 +446,10 @@
 }
 
 .step {
+  /* The picture, the tag, the name and the sentence all sit on the cell's
+     centre line: the cards read as three matched tiles under a centred
+     section head rather than three left-ragged columns. */
+  text-align: center;
   opacity: 0;
   transform: translateY(18px);
   /* Re-states the cell's own background transition, which this shorthand would

@@ -2253,11 +2253,19 @@ select.form-input,
   object-position: 70% center;
 }
 
-/* The full-screen frame crops the 3:1 shot at the sides; anchor it further
-   right so the whole robot, rear wheel included, stays in the picture. */
+/* The still is 16:9 with the crawler high in the right third. A viewport
+   taller than 16:9 crops the sides, so anchor right to keep the machine; the
+   2.82:1 band between tablet and desktop crops top and bottom instead, so
+   anchor high there to keep the crawler and its spray. */
 @media (min-width: 901px) {
   .environment-bg {
     object-position: 85% center;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 900px) {
+  .environment-bg {
+    object-position: 70% 20%;
   }
 }
 

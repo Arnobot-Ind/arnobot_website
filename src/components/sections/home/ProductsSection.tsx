@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import type { ProductId } from '@/types';
+import ProductLink from '@/components/ui/ProductLink';
 
 /* Each card opens its own product page at /product?id=<slug>, the same
    addresses the header and footer menus use.
@@ -72,7 +72,7 @@ export default function ProductsSection() {
 
       <div className="product-grid">
         {CARDS.map((card) => (
-          <Link className="product-card-link" href={`/product?id=${card.id}`} key={card.id}>
+          <ProductLink className="product-card-link" href={`/product?id=${card.id}`} key={card.id}>
             <article className="product-card">
               {HUD_CORNERS.map((corner) => (
                 <span className={`product-hud-corner ${corner}`} key={corner} />
@@ -81,7 +81,7 @@ export default function ProductsSection() {
               <img src={card.image} alt={card.alt} />
               <h3 className="russo">{card.name}</h3>
             </article>
-          </Link>
+          </ProductLink>
         ))}
       </div>
     </section>

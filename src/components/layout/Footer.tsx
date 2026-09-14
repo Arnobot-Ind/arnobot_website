@@ -2,17 +2,22 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { FOOTER_NAV, HQ_ADDRESS_LINES, SITE, SOCIAL_LINKS } from '@/data/site';
 import { MailIcon, PhoneIcon, PinIcon } from '@/components/ui/Icons';
+import ProductLink from '@/components/ui/ProductLink';
 
 function LinkColumn({ heading, links }: (typeof FOOTER_NAV)[number]) {
   return (
     <div>
       <h4>{heading}</h4>
       <ul className="footer-links">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link href={link.href}>{link.label}</Link>
-          </li>
-        ))}
+        {links.map((link) => {
+          // The Products column: see ProductLink for why those do not prefetch.
+          const Anchor = link.href.startsWith('/product') ? ProductLink : Link;
+          return (
+            <li key={link.href}>
+              <Anchor href={link.href}>{link.label}</Anchor>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

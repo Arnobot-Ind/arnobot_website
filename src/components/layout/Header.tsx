@@ -7,6 +7,7 @@ import { cn, queryAll } from '@/lib/dom';
 import { PRIMARY_NAV, PRODUCT_NAV, SECONDARY_NAV, SITE } from '@/data/site';
 import { CaretIcon, CloseIcon } from '@/components/ui/Icons';
 import LogoMark from '@/components/ui/LogoMark';
+import ProductLink from '@/components/ui/ProductLink';
 
 const DESKTOP_BREAKPOINT = 1024;
 const MENU_WIDTH_FALLBACK = 220;
@@ -366,9 +367,9 @@ export default function Header() {
                 >
                   {PRODUCT_NAV.map((item) => (
                     <li key={item.href}>
-                      <Link href={item.href} onClick={() => setDropdownOpen(false)}>
+                      <ProductLink href={item.href} onClick={() => setDropdownOpen(false)}>
                         {item.label}
-                      </Link>
+                      </ProductLink>
                     </li>
                   ))}
                 </ul>
@@ -466,9 +467,9 @@ export default function Header() {
                 >
                   {PRODUCT_NAV.map((item) => (
                     <li role="none" key={item.href}>
-                      <Link href={item.href} role="menuitem" onClick={() => setMobileOpen(false)}>
+                      <ProductLink href={item.href} role="menuitem" onClick={() => setMobileOpen(false)}>
                         {item.label}
-                      </Link>
+                      </ProductLink>
                     </li>
                   ))}
                 </ul>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import SiteChrome from '@/components/layout/SiteChrome';
 import StatusSection from '@/components/sections/StatusSection';
+import ProductLink from '@/components/ui/ProductLink';
 
 export const metadata: Metadata = { title: 'Page not found' };
 
@@ -20,9 +21,9 @@ export default function NotFound() {
         <Link href="/" className="btn btn-accent">
           Back to home
         </Link>
-        <Link href="/product" className="btn btn-outline">
+        <ProductLink href="/product" className="btn btn-outline">
           Explore products
-        </Link>
+        </ProductLink>
       </StatusSection>
     </SiteChrome>
   );

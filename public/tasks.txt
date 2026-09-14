@@ -1,0 +1,84 @@
+Website Verification & Polish
+
+Inspect and verify the existing website first. Ensure every listed page section occupies one full-screen view on desktop and remains responsive on smaller screens. Verify About, Technology, Company, Careers, Contact, and all Product pages, including their listed sections and final CTA + Footer. Make only minor, necessary improvements. Do not redesign or change working functionality, content, routes, components, animations, or overall style. Polish fonts, weights, text sizes, spacing, alignment, buttons, borders, cards, navigation, CSS, and responsive layouts. Follow: Verify → Identify issue → Smallest change → Verify again. Keep the premium, futuristic, minimal, modern robotics/deep-tech look.
+
+Task 1 : 
+Verify the sections in About page — each section should occupy one full screen view.
+1. Hero Section
+2. Who We Are?
+3. Our Robotics Solutions
+4. Built for environments humans can't enter.
+5. Rewards & Recognition
+6. Industries We Serve
+7. Ready to automate hazardous operations? + Footer
+
+Task 2 :
+Verify the sections in Technolgy page — each section should occupy one full screen view.
+1. The Autonomy Platform for Critical Ground
+2. Specialized Robots
+3. Critical Areas
+4. Hardware & Software
+5. Software Overview
+6. Perceive. Localise. Decide.
+7. Analytics & Operations
+8. Robust & Reliable
+9. Ready to Automate Hazardous Operations? + Footer 
+
+Task 3 :
+Verify the sections in Company page — each section should occupy one full screen view.
+1. Where Innovation Meets Automation
+2. From Ideas to Impact
+3. Our Mission
+4. Our Vision
+5. Our Values
+6. A Letter from the Founder
+7. What We Have Built So Far
+8. Ready to Automate Hazardous Operations? + Footer 
+
+Task 4 :
+Verify the sections in Company page — each section should occupy one full screen view.
+1. Where Innovation Meets Automation
+2. From Ideas to Impact
+3. Our Mission
+4. Our Vision
+5. Our Values
+6. A Letter from the Founder
+7. What We Have Built So Far
+8. Ready to Automate Hazardous Operations? + Footer 
+
+Task 5 :
+Verify the sections in Company page — each section should occupy one full screen view.
+1. Build the Robots That Go Where People Shouldn't
+2. Some Places Are Too Dangerous for People
+3. Built In-House
+4. Engineers & What They Last Shipped
+5. Four Steps
+6. Ready to Automate Hazardous Operations? + Footer  
+
+Task 6 : 
+Verify the sections in Contact us page — each section should occupy one full screen view.
+1. Let’s Build the Future Together
+2. Reach the Right Desk
+3. How Can We Help?
+4. Visit the Ahmedabad Office
+5. Ready to Automate Hazardous Operations? + Footer  
+
+Task 7 : 
+Verify the sections in Product > all product pages — each section should occupy one full screen view.
+1. Rapid Tactical Reconnaissance
+2. NEXUS
+3. Features & Applications
+4. Product Showcase & Operations
+5. Ready to Automate Hazardous Operations? + Footer  
+
+Task 8 :
+
+/goal 
+
+Inspect and verify the existing website first. Make only **minor, necessary improvements** while keeping functionality, content, routes, components, responsiveness, animations, and overall design intact. Do not redesign or rewrite working parts.
+
+Polish the entire website consistently, including **fonts, font weights, text sizes, CSS, buttons, titles, spacing, alignment, borders, cards, navigation, and responsive layouts**. Fix visual inconsistencies and small UI issues while maintaining the existing theme, premium, futuristic, mordern, minimalistic, robotics/deep-tech style.
+
+Follow: **Verify → Identify issue → Make the smallest change → Verify again.**
+
+The final result should feel like the **same website, but cleaner, more consistent, polished, professional, and production-ready.**

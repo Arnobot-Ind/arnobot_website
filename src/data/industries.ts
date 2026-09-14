@@ -243,34 +243,28 @@ export const HOME_INDUSTRY_CARDS: ReadonlyArray<{
   {
     id: 'industrial',
     label: 'Industrial Operations',
-    /* The only detail shot in the row, and the deliberate odd one out: the copy
-       for this entry is about automating work in hot, noisy, hazardous plants,
-       and we have no photograph of a machine inside one. This says the same
-       thing through the interface — "Caution Autonomous" stencilled above an
-       isolator being thrown, battery state beside it. It is the one frame here
-       whose lettering IS legible at card size, because it is painted large and
-       in yellow rather than etched into the machine.
-       Same subject as `tech-reliability-field.webp` on the technology page,
-       from a different frame of the same clip. */
-    image: '/assets/images/card-industry-industrial-v3.webp',
-    alt: 'Hand throwing the isolator switch on a Saibya control panel stencilled "Caution Autonomous", battery state display alongside',
+    /* The machine inside a plant at last: a Saibya-class UGV, beacon lit,
+       driving the aisle of a pump hall between the motor sets and under the
+       overhead crane — the hot, noisy, hazardous floor the copy for this
+       entry is about. Generated imagery (2026-09-08), not footage; nothing
+       we have shot shows a robot in a plant. Wide, evenly lit and low in
+       contrast, so under `grayscale(80%)` it sits calm between the darker
+       frames either side rather than competing with them. */
+    image: '/assets/images/card-industry-industrial-v4.webp',
+    alt: 'Four-wheeled ARNOBOT UGV with an amber beacon driving down the aisle of an industrial pump hall, motor sets on the left and an overhead crane above',
   },
   {
     id: 'infrastructure',
     label: 'Critical Infrastructure',
-    /* The same run and the same transmission tower as before, four seconds
-       later. The old cut was the machine at distance in the thickest of the
-       dust: pale body, pale haze, pale ground, and under `grayscale(80%)` the
-       three collapsed into one grey and the card read as an empty tile. Here
-       the ATM is close, side-on and turning, so it holds as the frame's one
-       dark mass against the dust, and the wheels are throwing dirt rather than
-       sitting still in it.
-       The tower is the only piece of infrastructure in any photograph we have,
-       which is the whole reason this frame stays with this label — so the crop
-       starts 170px in from the left to keep it, rather than centring on the
-       machine and losing it off the edge. */
-    image: '/assets/images/card-industry-infra-v2.webp',
-    alt: 'ATM Any Terrain Machine turning through loose dirt below a high-voltage transmission tower, dust thrown up behind its wheels',
+    /* A black UGV carrying strapped-down cases over the rubble of a
+       collapsed structure, two operators crouched behind it over a ground
+       station. Generated imagery (2026-09-08), not footage. The machine is
+       the one dark mass against pale concrete and a grey sky, so it holds
+       as a shape under `grayscale(80%)` where the old dust-and-tower frame
+       tended to wash out. Cropped from the centre of the 1336×744 render,
+       which keeps both the machine and the operators inside the card. */
+    image: '/assets/images/card-industry-infra-v3.webp',
+    alt: 'Black four-wheeled UGV carrying strapped-down equipment cases across the rubble of a collapsed building, two operators crouched behind it with a ground control laptop',
   },
   {
     id: 'solar',
