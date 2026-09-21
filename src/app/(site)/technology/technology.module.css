@@ -435,14 +435,21 @@
    picture at the top of each cell and the staggered reveal are the page's own.
    -------------------------------------------------------------------------- */
 
-.steps {
+/* The measure and the centring sit one step above the global's `margin: 0`:
+   a CSS module can land before style.css in a production build, and at equal
+   specificity the grid then lost its `auto` margins and sat flush left under a
+   centred head. Same guard as the career page's `grid3`. */
+.steps:global(.card-grid) {
   /* Explicit width: the section is a column flex box that does not stretch its
      items, and a shrink-wrapped grid sized itself to its longest line and ran
      off the right edge of a phone. */
   width: 100%;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   max-width: var(--measure);
-  margin: 0 auto;
+  margin-inline: auto;
+}
+
+.steps {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
 }
 
 .step {
@@ -452,8 +459,14 @@
   text-align: center;
   opacity: 0;
   transform: translateY(18px);
-  /* Re-states the cell's own background transition, which this shorthand would
-     otherwise drop, so the hover wash still fades in. */
+}
+
+/* One step above `card-cell` for the same load-order reason as the grid: the
+   cell's own `transition: background-color` would otherwise win in production
+   and the cards would snap in instead of rising. Re-states that background
+   transition, which this shorthand would otherwise drop, so the hover wash
+   still fades in. */
+.step:global(.card-cell) {
   transition:
     opacity var(--t-slowest) var(--ease-lift),
     transform var(--t-slowest) var(--ease-lift),
@@ -502,8 +515,9 @@
 }
 
 /* Set as a `micro-label`; the accent is the page's own, because this line is a
-   step number rather than a caption. */
-.stepIndex {
+   step number rather than a caption. Qualified so it beats `micro-label`'s
+   muted colour whichever stylesheet lands last. */
+.stepIndex:global(.micro-label) {
   color: var(--accent);
   margin-bottom: 16px;
 }
@@ -518,7 +532,9 @@
    -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .step {
+  /* Matches the qualified reveal rule's specificity, or the transition it
+     cancels would survive. */
+  .step:global(.card-cell) {
     opacity: 1;
     transform: none;
     transition: none;
