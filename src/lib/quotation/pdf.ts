@@ -38,6 +38,7 @@ const ALT_FILL = rgb(0xea / 255, 0xef / 255, 0xf7 / 255);
 const LIGHT = rgb(0xf2 / 255, 0xf5 / 255, 0xfa / 255);
 const GRID = rgb(0xc9 / 255, 0xd3 / 255, 0xe6 / 255);
 const WHITE = rgb(1, 1, 1);
+const RED = rgb(0xc0 / 255, 0, 0);
 
 const FOOTER_TEXT =
   'Arnobot Private Limited  |  www.arnobot.in  |  contact@arnobot.in  |  +91 99255 12860';
@@ -418,7 +419,13 @@ function buildTerms(input: QuotationInput, charset: ReadonlySet<number>): Run[][
   );
   for (const line of (input.note ?? '').split(/\r?\n/)) {
     const text = toWinAnsi(line.trim(), charset);
-    if (text) terms.push([{ text: '•  ' }, { text }]);
+    if (text) {
+      terms.push([
+        { text: '•  ', color: RED },
+        { text: 'Note:', bold: true, color: RED },
+        { text: ` (${text})`, color: RED },
+      ]);
+    }
   }
   return terms;
 }
