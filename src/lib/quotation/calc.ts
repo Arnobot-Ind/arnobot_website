@@ -115,6 +115,12 @@ export function formatLongDate(date: Date): string {
   return `${date.getDate()} ${MONTHS[date.getMonth()] ?? ''} ${date.getFullYear()}`;
 }
 
+/**
+ * The quotation is laid out on a single A4 page with no overflow handling, so
+ * the note is capped to keep the terms from running off the bottom.
+ */
+export const NOTE_MAX_LENGTH = 600;
+
 /** Reject anything that would produce a nonsensical or empty quotation. */
 export function validate(input: QuotationInput): string[] {
   const errors: string[] = [];
@@ -133,6 +139,9 @@ export function validate(input: QuotationInput): string[] {
   }
   if (input.gstPercent < 0 || input.gstPercent > 100) {
     errors.push('GST must be between 0 and 100.');
+  }
+  if ((input.note?.length ?? 0) > NOTE_MAX_LENGTH) {
+    errors.push(`Note must be ${NOTE_MAX_LENGTH} characters or fewer.`);
   }
   // The component rows are pre-seeded from the product's presets, so a
   // quotation with every amount still blank is a half-filled form rather than a

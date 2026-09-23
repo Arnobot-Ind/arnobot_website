@@ -356,7 +356,7 @@ function drawChrome(page: PDFPage, fonts: Fonts, logo: { width: number; height: 
 }
 
 /** Terms, assembled from whatever the input actually specifies. */
-function buildTerms(input: QuotationInput): Run[][] {
+function buildTerms(input: QuotationInput, charset: ReadonlySet<number>): Run[][] {
   const terms: Run[][] = [];
   const bullet = (lead: string, rest: string): Run[] => [
     { text: '•  ' },
@@ -380,17 +380,11 @@ function buildTerms(input: QuotationInput): Run[][] {
       ),
     );
   }
-  terms.push(
-    bullet(
-      'Payment',
-      ' — 50% advance on approval of this quotation, balance on handover of the repaired unit.',
-    ),
-  );
   if (input.turnaroundDays && input.turnaroundDays > 0) {
     terms.push(
       bullet(
         'Turnaround',
-        ` — the unit will be returned within ${input.turnaroundDays} working days from receipt of advance and confirmed approval.`,
+        ` — the unit will be returned within ${input.turnaroundDays} working days from confirmed approval.`,
       ),
     );
   }
@@ -422,7 +416,25 @@ function buildTerms(input: QuotationInput): Run[][] {
       " — to-and-fro transport of the unit is to the customer's account unless agreed otherwise in writing.",
     ),
   );
+  for (const line of (input.note ?? '').split(/\r?\n/)) {
+    const text = toWinAnsi(line.trim(), charset);
+    if (text) terms.push([{ text: '•  ' }, { text }]);
+  }
   return terms;
+}
+
+/**
+ * Standard-14 Helvetica can only draw WinAnsi characters and pdf-lib throws on
+ * anything else, so free text typed into the note (a ₹ sign, Gujarati, an emoji)
+ * would otherwise fail the whole PDF. The rupee sign is spelled "INR" to match
+ * the rest of the document; anything else unsupported becomes "?".
+ */
+function toWinAnsi(text: string, charset: ReadonlySet<number>): string {
+  let out = '';
+  for (const ch of text.replace(/₹\s*/g, 'INR ')) {
+    out += charset.has(ch.codePointAt(0) ?? 0) ? ch : '?';
+  }
+  return out;
 }
 
 /** Build the quotation PDF. Returns the raw bytes. */
@@ -620,7 +632,8 @@ export async function renderQuotationPdf(input: QuotationInput): Promise<Uint8Ar
 
   // ---- 5. terms ----
   L.section(`${input.serviceCharge > 0 ? '5' : '4'}. Terms & Conditions`);
-  for (const term of buildTerms(input)) {
+  const charset = new Set(fonts.regular.getCharacterSet());
+  for (const term of buildTerms(input, charset)) {
     L.paragraph(term);
   }
 

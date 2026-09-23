@@ -46,6 +46,7 @@ function parseInput(body: unknown): QuotationInput {
     receivedOn: str(b.receivedOn).trim() || undefined,
     turnaroundDays: num(b.turnaroundDays),
     warrantyMonths: num(b.warrantyMonths),
+    note: str(b.note).trim() || undefined,
   };
 }
 

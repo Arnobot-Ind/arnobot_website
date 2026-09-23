@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArnobotLogo } from '@/components/quiz/Brand';
 import {
+  NOTE_MAX_LENGTH,
   amountInWords,
   computeTotals,
   defaultReference,
@@ -85,6 +86,7 @@ export default function QuotationPage() {
   const [validityDays, setValidityDays] = useState('15');
   const [turnaroundDays, setTurnaroundDays] = useState('');
   const [warrantyMonths, setWarrantyMonths] = useState('3');
+  const [note, setNote] = useState('');
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -179,11 +181,12 @@ export default function QuotationPage() {
       receivedOn: receivedOn.trim() || undefined,
       turnaroundDays: toNumber(turnaroundDays),
       warrantyMonths: toNumber(warrantyMonths),
+      note: note.trim() || undefined,
     }),
     [
       product, rows, serviceCharge, discount, gstPercent, referenceNo, date,
       validityDays, assessedBy, customer, contact, serialNo, receivedOn,
-      turnaroundDays, warrantyMonths,
+      turnaroundDays, warrantyMonths, note,
     ],
   );
 
@@ -351,6 +354,20 @@ export default function QuotationPage() {
                 <label className={LABEL} htmlFor="warrantyMonths">Warranty (months)</label>
                 <input id="warrantyMonths" type="number" min={0} className={INPUT} value={warrantyMonths} onChange={(e) => setWarrantyMonths(e.target.value)} />
               </div>
+            </div>
+            <div className="sm:col-span-2">
+              <label className={LABEL} htmlFor="note">
+                Note <span className="font-normal text-muted">(optional — each line is added to Terms &amp; Conditions in the PDF)</span>
+              </label>
+              <textarea
+                id="note"
+                rows={3}
+                maxLength={NOTE_MAX_LENGTH}
+                className={INPUT}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="e.g. Unit to be collected from site by the customer."
+              />
             </div>
           </div>
         </section>

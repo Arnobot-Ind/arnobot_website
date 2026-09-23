@@ -43,6 +43,8 @@ export interface QuotationInput {
   readonly turnaroundDays?: number;
   /** Warranty on replaced parts, in months; 0 omits the term. */
   readonly warrantyMonths?: number;
+  /** Free-text note; each non-blank line is added as a Terms & Conditions bullet. */
+  readonly note?: string;
 }
 
 /** Derived money figures. Every field is whole rupees. */
