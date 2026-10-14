@@ -97,6 +97,14 @@ ul.navlist li a .idx{font-family:var(--font-plex-mono),monospace; color:var(--te
 ul.navlist li a:hover, ul.navlist li a.active{color:var(--navy); border-left-color:var(--steel); background:var(--paper-2);}
 ul.navlist li a.active .idx{color:var(--steel);}
 .rail-bottom{padding:0 22px; color:var(--text-3); font-size:10px; text-transform:uppercase; letter-spacing:.1em; line-height:1.7;}
+.ppt-btn{
+  display:flex; align-items:center; gap:8px; margin:18px 22px 0; padding:9px 14px;
+  border:1px solid var(--steel); background:var(--paper); color:var(--navy); cursor:pointer;
+  font-family:var(--font-plex-mono), monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  transition:.15s;
+}
+.ppt-btn:hover:not(:disabled){background:var(--navy); border-color:var(--navy); color:#fff;}
+.ppt-btn:disabled{opacity:.6; cursor:progress;}
 
 main{flex:1; min-width:0;}
 section{padding:96px 64px; border-bottom:1px solid var(--line); position:relative; background:var(--paper);}
@@ -371,6 +379,7 @@ table.uc-table tbody tr:hover td{background:var(--paper-2);}
   ul.navlist li a{padding:8px 10px; white-space:nowrap; border-left:none; border-bottom:2px solid transparent;}
   ul.navlist li a.active{border-left:none; border-bottom-color:var(--steel);}
   .rail-bottom{display:none;}
+  .ppt-btn{margin:0; padding:7px 10px; flex-shrink:0; white-space:nowrap;}
   main{padding-top:58px;}
   section{padding:56px 22px;}
   .hero{padding:76px 22px 56px; min-height:auto;}

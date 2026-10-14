@@ -13,8 +13,8 @@ import { useEffect } from 'react';
 
 const NS = 'http://www.w3.org/2000/svg';
 
-const TOTAL_CR = 4;
-const allocation = [
+export const TOTAL_CR = 4;
+export const allocation = [
   { label: 'R&D & Product Development', pct: 25, color: '#230C75' },
   { label: 'Infrastructure & Lab', pct: 20, color: '#2F3F8E' },
   { label: 'Team & Hiring', pct: 15, color: '#375E9D' },
@@ -177,6 +177,7 @@ export default function PitchScripts() {
         f.title = el.getAttribute('aria-label') || 'ARNOBOT video';
         f.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture';
         f.allowFullscreen = true;
+        Object.assign(f.dataset, el.dataset); // the PPT export reads the video id off whichever is in the slot
         el.replaceWith(f);
       };
       el.addEventListener('click', onClick);

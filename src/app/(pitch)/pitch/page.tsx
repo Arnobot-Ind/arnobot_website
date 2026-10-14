@@ -1,4 +1,5 @@
 import PitchScripts from '@/components/PitchScripts';
+import PitchPptxButton from '@/components/PitchPptxButton';
 
 const A = '/pitch/assets';
 
@@ -25,6 +26,7 @@ export default function PitchPage() {
               <li><a href="#recognition"><span className="idx">07</span> Recognition</a></li>
               <li><a href="#contact"><span className="idx">08</span> Contact</a></li>
             </ul>
+            <PitchPptxButton />
           </div>
           <div className="rail-bottom">Ahmedabad, India<br />Est. 2024<br /><br />Private &amp; Confidential</div>
         </nav>
