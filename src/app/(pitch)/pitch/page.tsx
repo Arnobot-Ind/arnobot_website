@@ -384,12 +384,13 @@ export default function PitchPage() {
             <h2 className="sec-title">From field trial to purchase order.</h2>
 
             {/* Every figure here is itemised somewhere else in the deck —
-                the awards and media in section 07, the design registration in
-                the legal record. Nothing is counted twice. */}
+                the awards and media in section 07, the design patents, patent
+                filing and trademark in the legal record. Nothing is counted twice. */}
             <div className="trac-nums">
               <div className="tn"><div className="num">5</div><div className="lbl">Awards &amp; recognitions</div></div>
-              <div className="tn"><div className="num">1</div><div className="lbl">Design registration — granted</div></div>
+              <div className="tn"><div className="num">2</div><div className="lbl">Design patents</div></div>
               <div className="tn"><div className="num">1</div><div className="lbl">Provisional patent</div></div>
+              <div className="tn"><div className="num">1</div><div className="lbl">Trademark</div></div>
               <div className="tn"><div className="num">3</div><div className="lbl">Media features</div></div>
               <div className="tn"><div className="num">18+</div><div className="lbl">Exhibitions</div></div>
               <div className="tn"><div className="num">2+</div><div className="lbl">Guest lectures</div></div>
@@ -472,7 +473,7 @@ export default function PitchPage() {
               <div className="cell svc"><div className="n">01</div><div><h4>The machines exist</h4><p>Four platforms built and run on real sites — a ship hull at Alang, a solar plant, open desert, broken ground. This is a scale-up, not a first build.</p></div></div>
               <div className="cell svc"><div className="n">02</div><div><h4>Demand is named, not modelled</h4><p>Two named clients — one of them an Indian Army engineer regiment — a purchase order in line on the SOLARISM project, and four completed field pilots.</p></div></div>
               <div className="cell svc"><div className="n">03</div><div><h4>One core, many bodies</h4><p>The same four-layer autonomy stack runs on every vehicle, so each new mission is an integration measured in weeks rather than a fresh product programme.</p></div></div>
-              <div className="cell svc"><div className="n">04</div><div><h4>Built here, protected here</h4><p>Designed, fabricated and integrated in Ahmedabad, with a granted design registration on the tactical platform and a provisional patent filed.</p></div></div>
+              <div className="cell svc"><div className="n">04</div><div><h4>Built here, protected here</h4><p>Designed, fabricated and integrated in Ahmedabad, with two design patents, a provisional patent and a trademark.</p></div></div>
             </div>
 
             <p className="fin-note">Detailed financials, cap table and the full due-diligence pack are shared on request under NDA.</p>
