@@ -2,7 +2,7 @@
  * Renders a repair quotation as a branded PDF.
  *
  * A direct port of the vault generator
- * `ArnobotDoc/02-Products/Nexus/Repair/gen_nexus_repair_quotation.py`: same A4
+ * `ArnobotDoc/02-Products/Nexus/Docs/Repair/gen_nexus_repair_quotation.py`: same A4
  * geometry, same navy (#1F3864) house style, same section order. Layout is
  * hand-placed rather than flowed, so keep the two in step if either changes.
  *

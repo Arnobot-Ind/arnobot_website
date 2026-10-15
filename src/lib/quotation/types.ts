@@ -2,7 +2,7 @@
  * Repair-quotation domain types.
  *
  * Mirrors the branded PDF produced by the vault generator at
- * `02-Products/Nexus/Repair/gen_nexus_repair_quotation.py`, generalised so any
+ * `02-Products/Nexus/Docs/Repair/gen_nexus_repair_quotation.py`, generalised so any
  * product and any component list can be quoted.
  */
 

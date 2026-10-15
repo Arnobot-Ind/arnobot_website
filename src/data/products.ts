@@ -77,7 +77,7 @@ const PRODUCTS: Readonly<Record<ProductId, Product>> = {
       { icon: 'disaster', label: 'Disaster response' },
     ],
     /* 72 frames, one every 5 degrees, rendered in Cycles from the Fusion OBJ
-       (ArnobotDoc `02-Products/turntable.py`) with the matte-gunmetal body.
+       (ArnobotDoc `02-Products/Blender-Tools/turntable.py`) with the matte-gunmetal body.
        No contact shadow is baked in — `.spin-frame` draws its own drop-shadow
        off the alpha, so a rendered one would double up.
        It opens on 18, the front-on pose. */
@@ -201,7 +201,7 @@ const PRODUCTS: Readonly<Record<ProductId, Product>> = {
        "ARNOBOT ™" bug sits top-right on every frame and a captioned title runs
        across the picture throughout — including the two later captions that
        misspell "active". Both cards now play their own re-cut from the 3840x2160
-       master (ArnobotDoc `02-Products/ATM-Any-Terrain-Machine/Videos/ATM_Vehicle
+       master (ArnobotDoc `05-Marketing/Products/ATM/Videos/ATM_Vehicle
        Demo.mp4`), cropped below the graphics at native resolution. The crop
        offset differs per segment because the captions do: the title band over the
        dust run sits higher than the lower-third over the grass runs, so the dust
@@ -402,7 +402,7 @@ const PRODUCTS: Readonly<Record<ProductId, Product>> = {
       { icon: 'mapping', label: 'Critical asset mapping' },
     ],
     /* 72 frames, one every 5 degrees, rendered in Cycles from the Fusion OBJ
-       (ArnobotDoc `02-Products/turntable.py`, `--up y`) with the top plate and
+       (ArnobotDoc `02-Products/Blender-Tools/turntable.py`, `--up y`) with the top plate and
        shrouds on the same matte gunmetal as the Saibya deck, and the world HDRI
        raised to 1.0 — at the pipeline default of 0.25 a metallic body has nothing
        to reflect off these near-vertical surfaces and renders black.
@@ -418,7 +418,7 @@ const PRODUCTS: Readonly<Record<ProductId, Product>> = {
     },
     /* All three cards are re-cut from the ship-hull trial Arnobot filmed at the
        Leela Group ship-recycling yard, Alang, on 26 July 2025 — the footage that
-       lives in ArnobotDoc as `02-Products/Altius/Videos/Arnobot (With
+       lives in ArnobotDoc as `05-Marketing/Products/Altius/Videos/Arnobot (With
        Courtsey).mp4`. It is the only material anywhere that shows this machine
        doing the job the page describes: climbing a hull and washing it down.
        It supersedes what these cards used to carry — an indoor wall climb beside
