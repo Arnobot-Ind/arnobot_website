@@ -14,8 +14,8 @@ import { allocation, TOTAL_CR } from '@/components/PitchScripts';
  *   - each product card links to its specification slide, which links back
  *     and across to its siblings (the accordion);
  *   - the video posters are links to the footage (the click-to-play facades);
- *   - the allocation donut is a native doughnut chart whose legend rows switch
- *     to hidden copies of the slide with that segment lit (the hover state);
+ *   - the allocation donut is a native, editable doughnut chart, its legend
+ *     carrying every amount the hover state reveals;
  *   - mail, phone and web lines on the contact slide are live links.
  *
  * Shape-level links in pptxgenjs are written without a relationship, which
@@ -140,15 +140,6 @@ function canvasPng(w: number, h: number, paint: (ctx: CanvasRenderingContext2D) 
   c.height = h;
   paint(c.getContext('2d')!);
   return c.toDataURL('image/png').replace(/^data:/, '');
-}
-
-/** Faded segment colour: the page drops other segments to 22% opacity over the section's paper. */
-function fade(hex: string, bg = C.paper2, keep = 0.22) {
-  const ch = (h: string, i: number) => parseInt(h.slice(i, i + 2), 16);
-  return [0, 2, 4]
-    .map((i) => Math.round(ch(hex, i) * keep + ch(bg, i) * (1 - keep)).toString(16).padStart(2, '0'))
-    .join('')
-    .toUpperCase();
 }
 
 export async function downloadPitchDeck() {
@@ -313,9 +304,9 @@ export async function downloadPitchDeck() {
 
   // ---- the plan: every slide in order, so links can name their target ------
 
-  type Page = { key: string; section: string; hidden?: boolean; draw: (s: Slide) => void };
+  type Page = { key: string; section: string; draw: (s: Slide) => void };
   const plan: Page[] = [];
-  const page = (key: string, section: string, draw: (s: Slide) => void, hidden = false) => plan.push({ key, section, draw, hidden });
+  const page = (key: string, section: string, draw: (s: Slide) => void) => plan.push({ key, section, draw });
   const at = (key: string) => plan.findIndex((p) => p.key === key) + 1;
 
   // 00 — Overview
@@ -623,65 +614,52 @@ export async function downloadPitchDeck() {
     });
   });
 
-  // 06 — The Ask: the donut, and one hidden copy per segment for its lit state
+  // 06 — The Ask: the allocation and the closing argument, on one slide
   const ask = sec('ask');
-  const askKicker = tx(ask, ':scope > .eyebrow');
-  const askKey = (i: number) => `ask-${i}`;
   const cr = (pct: number) => (TOTAL_CR * pct / 100).toFixed(2).replace(/\.00$/, '');
-  const askSlide = (lit: number | null) => (s: Slide) => {
+  page('ask', 'ask', (s) => {
     const lede = tx(ask, ':scope > .sec-lede').replace(/\s*Hover[^.]*\.\s*$/, '');
-    const y = header(s, askKicker, tx(ask, ':scope > .sec-title'), lede);
-    const d = Math.min(3.9, BOTTOM - y);
+    const y = header(s, tx(ask, ':scope > .eyebrow'), tx(ask, ':scope > .sec-title'), lede);
+    const bottom = BOTTOM - 0.4; // the NDA note sits under both columns
+
+    const lw = 4.0;
+    const d = 2.0;
+    const dx = X0 + (lw - d) / 2;
     s.addChart('doughnut', [{ name: 'Allocation', labels: allocation.map((a) => a.label), values: allocation.map((a) => a.pct) }], {
-      x: X0, y, w: d, h: d,
+      x: dx, y, w: d, h: d,
       holeSize: 64,
-      chartColors: allocation.map((a, i) => (lit === null || lit === i ? a.color.slice(1) : fade(a.color.slice(1)))),
+      chartColors: allocation.map((a) => a.color.slice(1)),
       dataBorder: { pt: 1.5, color: C.paper2 },
       showLegend: false, showValue: false, showPercent: false, showLabel: false, showTitle: false,
       chartArea: { fill: { color: C.paper2 } },
       plotArea: { fill: { color: C.paper2 } },
     });
-    const a = lit === null ? null : allocation[lit];
     text(s, [
-      { text: a ? `₹${cr(a.pct)} Cr` : tx(ask, '.raise-amt'), options: { fontFace: HEAD, fontSize: a ? 24 : 30, bold: true, color: C.indigo, breakLine: true } },
-      { text: a ? `${a.pct}% OF THE ASK` : 'TOTAL ASK', options: { fontFace: HEAD, fontSize: 8, color: C.text3, charSpacing: 1 } },
-    ], { x: X0 + d * 0.2, y: y + d * 0.3, w: d * 0.6, h: d * 0.4, align: 'center', valign: 'middle' });
+      { text: tx(ask, '.raise-amt'), options: { fontFace: HEAD, fontSize: 20, bold: true, color: C.indigo, breakLine: true } },
+      { text: 'TOTAL ASK', options: { fontFace: HEAD, fontSize: 7, color: C.text3, charSpacing: 1 } },
+    ], { x: dx + d * 0.2, y: y + d * 0.3, w: d * 0.6, h: d * 0.4, align: 'center', valign: 'middle' });
 
-    const lx = X0 + d + 0.6;
-    const lw = W - 0.55 - lx;
-    const rh = 0.46;
-    const ly = y + (d - rh * allocation.length - 0.4) / 2;
+    const ly = y + d + 0.2;
+    const rh = Math.min(0.3, (bottom - ly) / allocation.length);
     allocation.forEach((row, i) => {
       const ry = ly + i * rh;
-      const on = lit === i;
-      if (on) s.addShape('rect', { x: lx - 0.12, y: ry, w: lw + 0.12, h: rh, fill: { color: C.paper }, line: { color: C.line, width: 0.75 } });
-      s.addShape('rect', { x: lx, y: ry + rh / 2 - 0.07, w: 0.14, h: 0.14, fill: { color: row.color.slice(1) }, line: { type: 'none' } });
-      text(s, row.label, { x: lx + 0.3, y: ry, w: lw - 2.2, h: rh, valign: 'middle', fontSize: 13, color: on ? C.navy : C.text2, bold: on });
-      text(s, `₹${cr(row.pct)} Cr`, { x: lx + lw - 1.85, y: ry, w: 1.1, h: rh, valign: 'middle', align: 'right', fontSize: 11, color: C.text3 });
-      text(s, `${row.pct}%`, { x: lx + lw - 0.7, y: ry, w: 0.7, h: rh, valign: 'middle', align: 'right', fontSize: 11, bold: on, color: on ? C.indigo : C.text3 });
-      if (!on) s.addShape('line', { x: lx, y: ry + rh, w: lw, h: 0, line: { color: C.lineSoft, width: 0.75 } });
-      hotspot(s, lx - 0.12, ry, lw + 0.12, rh, on ? { slide: at('ask'), tooltip: 'Show the whole allocation' } : { slide: at(askKey(i)), tooltip: `Highlight ${row.label}` });
+      s.addShape('rect', { x: X0, y: ry + rh / 2 - 0.06, w: 0.12, h: 0.12, fill: { color: row.color.slice(1) }, line: { type: 'none' } });
+      text(s, row.label, { x: X0 + 0.25, y: ry, w: lw - 1.65, h: rh, valign: 'middle', fontSize: 11 });
+      text(s, `₹${cr(row.pct)} Cr`, { x: X0 + lw - 1.35, y: ry, w: 0.85, h: rh, valign: 'middle', align: 'right', fontSize: 10, color: C.text3 });
+      text(s, `${row.pct}%`, { x: X0 + lw - 0.45, y: ry, w: 0.45, h: rh, valign: 'middle', align: 'right', fontSize: 10, bold: true, color: C.indigo });
+      s.addShape('line', { x: X0, y: ry + rh, w: lw, h: 0, line: { color: C.line, width: 0.5 } });
     });
-    text(s, lit === null ? 'Click an allocation to light it on the chart.' : 'Click another allocation, or this one again to clear.', {
-      x: lx, y: ly + rh * allocation.length + 0.15, w: lw, h: 0.25, fontSize: 9.5, italic: true, color: C.text3,
-    });
-  };
-  page('ask', 'ask', askSlide(null));
-  allocation.forEach((_, i) => page(askKey(i), 'ask', askSlide(i), true));
 
-  page('ask-case', 'ask', (s) => {
-    const y = header(s, askKicker, 'Investment case');
-    const cells = all(ask, ':scope > .grid-4 .svc');
-    const cw = (CW - 0.25) / 2;
-    const ch = Math.min(2.1, (BOTTOM - 0.4 - y - 0.25) / 2);
-    cells.forEach((c, i) => {
-      const x = X0 + (i % 2) * (cw + 0.25);
-      const cy = y + Math.floor(i / 2) * (ch + 0.25);
-      box(s, x, cy, cw, ch);
-      text(s, tx(c, '.n'), { x: x + 0.3, y: cy + 0.3, w: 0.6, h: 0.4, fontFace: HEAD, fontSize: 18, bold: true, color: C.steel });
-      text(s, tx(c, 'h4'), { x: x + 1.0, y: cy + 0.3, w: cw - 1.3, h: 0.35, fontFace: HEAD, fontSize: 15, bold: true, color: C.navy });
-      text(s, tx(c, 'p'), { x: x + 1.0, y: cy + 0.75, w: cw - 1.3, h: ch - 0.95, fontSize: 13 });
-    });
+    const px = X0 + lw + 0.45;
+    const pw = W - 0.55 - px;
+    box(s, px, y, pw, bottom - y);
+    // one box, so PowerPoint flows the points however many lines each takes
+    const points = all(ask, ':scope > .grid-4 .svc');
+    text(s, points.flatMap((c, i): Run[] => [
+      { text: `${tx(c, '.n')}   `, options: { fontFace: HEAD, fontSize: 12, bold: true, color: C.steel, paraSpaceAfter: 3 } },
+      { text: tx(c, 'h4'), options: { fontFace: HEAD, fontSize: 12.5, bold: true, color: C.navy, breakLine: true } },
+      { text: tx(c, 'p'), options: { fontSize: 10.5, color: C.text2, paraSpaceAfter: 13, breakLine: i < points.length - 1 } },
+    ]), { x: px + 0.3, y: y + 0.2, w: pw - 0.6, h: bottom - y - 0.4, valign: 'middle' });
     text(s, tx(ask, '.fin-note'), { x: X0, y: BOTTOM - 0.2, w: CW, h: 0.25, fontSize: 9.5, italic: true, color: C.text3 });
   });
 
@@ -757,7 +735,6 @@ export async function downloadPitchDeck() {
       current = p.section;
     }
     const s = pres.addSlide({ masterName: 'RAIL', sectionTitle: label });
-    s.hidden = !!p.hidden;
     if (sec(p.section)?.classList.contains('alt')) {
       s.addShape('rect', { x: RAIL + 0.01, y: 0, w: W - RAIL - 0.01, h: H, fill: { color: C.paper2 }, line: { type: 'none' } });
     }
