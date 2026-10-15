@@ -11,8 +11,8 @@ import { allocation, TOTAL_CR } from '@/components/PitchScripts';
  * The page's widgets become their native PowerPoint equivalents:
  *   - the section rail sits on every slide, current section lit, each entry a
  *     link to that section's first slide (the scroll spy);
- *   - each product card links to its specification slide, which links back
- *     and across to its siblings (the accordion);
+ *   - every product's accordion is shown open: two platforms a slide, each
+ *     with its specification table;
  *   - the video posters are links to the footage (the click-to-play facades);
  *   - the allocation donut is a native, editable doughnut chart, its legend
  *     carrying every amount the hover state reveals;
@@ -253,8 +253,8 @@ export async function downloadPitchDeck() {
     return cy + ph - y;
   };
 
-  const eyebrow = (s: Slide, label: string, y = 0.45) =>
-    text(s, label.toUpperCase(), { x: X0, y, w: CW, h: 0.25, fontFace: HEAD, fontSize: 10, bold: true, color: C.steel, charSpacing: 2 });
+  const eyebrow = (s: Slide, label: string, y = 0.45, x = X0, w = CW) =>
+    text(s, label.toUpperCase(), { x, y, w, h: 0.25, fontFace: HEAD, fontSize: 10, bold: true, color: C.steel, charSpacing: 2 });
 
   /** Eyebrow, title and optional lede; returns where the content starts. */
   const header = (s: Slide, kicker: string, title: string, lede?: string) => {
@@ -332,155 +332,123 @@ export async function downloadPitchDeck() {
     });
   });
 
-  // 01 — Company
+  // 01 — Company: the claim with the workshop that backs it, then the people
   const co = sec('company');
   const coKicker = tx(co, ':scope > .eyebrow');
-  const [roof, team] = blocks(co);
+  const [roof] = blocks(co);
   page('company', 'company', (s) => {
     const y = header(s, coKicker, tx(co, '.sec-title'), tx(co, '.sec-lede'));
-    const figs = all(co, '.proof-figure');
-    const fw = (CW - 0.3 * (figs.length - 1)) / figs.length;
-    const fh = Math.min(BOTTOM - y - 0.75, fw * 0.75);
+    const band = one(co, '.team-band');
+    const figs = [
+      ...all(co, '.proof-figure').map((f) => ({ src: srcOf(f), alt: one(f, 'img')?.getAttribute('alt'), cap: tx(f, 'figcaption'), fit: 'cover' as const })),
+      // the team photograph is a cut-out on white, so it is never cropped
+      { src: srcOf(band), alt: one(band, 'img')?.getAttribute('alt'), cap: tx(band, 'p'), fit: 'contain' as const },
+    ];
+    const fw = (CW - 0.25 * (figs.length - 1)) / figs.length;
+    const fh = Math.min(BOTTOM - y - 1.15, fw * 0.8);
     eyebrow(s, roof?.label ?? '', y - 0.05);
     figs.forEach((f, i) => {
-      const x = X0 + i * (fw + 0.3);
-      image(s, srcOf(f), x, y + 0.3, fw, fh, 'cover', one(f, 'img')?.getAttribute('alt') ?? undefined);
-      caption(s, tx(f, 'figcaption'), x, y + 0.3 + fh + 0.08, fw);
+      const x = X0 + i * (fw + 0.25);
+      image(s, f.src, x, y + 0.3, fw, fh, f.fit, f.alt ?? undefined);
+      text(s, f.cap, { x, y: y + 0.3 + fh + 0.08, w: fw, h: 0.75, fontSize: 10, color: C.text3 });
     });
   });
 
-  page('company-mission', 'company', (s) => {
-    const y = header(s, coKicker, 'Mission, vision and values');
-    const cells = all(co, ':scope > .grid-2 > .cell');
-    const cw = (CW - 0.25) / 2;
-    const ch = (BOTTOM - y - 0.25) / 2;
-    cells.forEach((c, i) => {
-      const x = X0 + (i % 2) * (cw + 0.25);
-      const cy = y + Math.floor(i / 2) * (ch + 0.25);
-      box(s, x, cy, cw, ch);
-      text(s, tx(c, 'h4'), { x: x + 0.3, y: cy + 0.25, w: cw - 0.6, h: 0.3, fontFace: HEAD, fontSize: 14, bold: true, color: C.navy });
-      const pillEls = all(c, '.pill');
-      if (pillEls.length) pills(s, pillEls.map((p) => clean(p.textContent)), x + 0.3, cy + 0.7, cw - 0.6);
-      else text(s, tx(c, 'p'), { x: x + 0.3, y: cy + 0.65, w: cw - 0.6, h: ch - 0.85, fontSize: 13 });
-    });
-  });
-
-  page('company-team', 'company', (s) => {
-    const y = header(s, coKicker, team?.label ?? '');
+  page('company-people', 'company', (s) => {
+    const y = header(s, coKicker, 'Mission, values and leadership');
     const people = all(co, '.founder');
     const pw = (CW - 0.3 * (people.length - 1)) / people.length;
+    const ph = 1.4;
     people.forEach((p, i) => {
       const x = X0 + i * (pw + 0.3);
-      bracket(s, x, y, pw, 1.75);
-      text(s, tx(p, '.ph'), { x: x + 0.3, y: y + 0.3, w: 0.6, h: 0.6, fontFace: HEAD, fontSize: 15, bold: true, color: C.indigo, align: 'center', valign: 'middle', line: { color: C.steel, width: 1.5 } });
-      text(s, tx(p, 'h3'), { x: x + 1.1, y: y + 0.28, w: pw - 1.3, h: 0.35, fontFace: HEAD, fontSize: 16, bold: true, color: C.navy });
-      text(s, tx(p, '.role').toUpperCase(), { x: x + 1.1, y: y + 0.65, w: pw - 1.3, h: 0.25, fontFace: HEAD, fontSize: 8.5, color: C.steel, charSpacing: 1 });
-      text(s, tx(p, '.cred'), { x: x + 0.3, y: y + 1.1, w: pw - 0.6, h: 0.5, fontSize: 11 });
+      bracket(s, x, y, pw, ph);
+      text(s, tx(p, '.ph'), { x: x + 0.25, y: y + 0.25, w: 0.55, h: 0.55, fontFace: HEAD, fontSize: 14, bold: true, color: C.indigo, align: 'center', valign: 'middle', line: { color: C.steel, width: 1.5 } });
+      text(s, tx(p, 'h3'), { x: x + 0.95, y: y + 0.24, w: pw - 1.15, h: 0.32, fontFace: HEAD, fontSize: 15, bold: true, color: C.navy });
+      text(s, tx(p, '.role').toUpperCase(), { x: x + 0.95, y: y + 0.58, w: pw - 1.15, h: 0.22, fontFace: HEAD, fontSize: 8, color: C.steel, charSpacing: 1 });
+      text(s, tx(p, '.cred'), { x: x + 0.25, y: y + 0.92, w: pw - 0.5, h: 0.4, fontSize: 10 });
     });
-    const band = one(co, '.team-band');
-    const by = y + 1.75 + 0.35;
-    const bh = BOTTOM - by;
-    const bw = bh * 1.5;
-    image(s, srcOf(band), X0, by, bw, bh, 'cover', one(band, 'img')?.getAttribute('alt') ?? undefined);
-    text(s, runs(one(band, 'p'), { fontSize: 18, color: C.text2 }), { x: X0 + bw + 0.4, y: by, w: CW - bw - 0.4, h: bh, valign: 'middle' });
+    const cy = y + ph + 0.3;
+    const cells = all(co, ':scope > .grid-2 > .cell');
+    const cw = (CW - 0.2 * (cells.length - 1)) / cells.length;
+    const ch = Math.min(2.7, BOTTOM - cy);
+    cells.forEach((c, i) => {
+      const x = X0 + i * (cw + 0.2);
+      box(s, x, cy, cw, ch);
+      text(s, tx(c, 'h4'), { x: x + 0.22, y: cy + 0.2, w: cw - 0.44, h: 0.3, fontFace: HEAD, fontSize: 13, bold: true, color: C.navy });
+      const pillEls = all(c, '.pill');
+      if (pillEls.length) pills(s, pillEls.map((q) => clean(q.textContent)), x + 0.22, cy + 0.6, cw - 0.44, { pt: 9.5 });
+      else text(s, tx(c, 'p'), { x: x + 0.22, y: cy + 0.58, w: cw - 0.44, h: ch - 0.75, fontSize: 11 });
+    });
   });
 
-  // 02 — Products
+  // 02 — Products: two platforms a slide, each with its own specification
   const pr = sec('products');
   const prKicker = tx(pr, ':scope > .eyebrow');
   const products = all(pr, '.product');
-  const prodKey = (i: number) => `product-${i}`;
-  page('products', 'products', (s) => {
-    const y = header(s, prKicker, tx(pr, ':scope > .sec-title'), tx(pr, ':scope > .sec-lede'));
-    const cw = (CW - 0.25) / 2;
-    const ch = (BOTTOM - y - 0.25) / 2;
-    products.forEach((p, i) => {
-      const x = X0 + (i % 2) * (cw + 0.25);
-      const cy = y + Math.floor(i / 2) * (ch + 0.25);
-      bracket(s, x, cy, cw, ch);
-      const iw = cw * 0.5;
-      image(s, srcOf(p, '.shot img'), x + 0.15, cy + 0.15, iw, ch - 0.3, 'cover', tx(p, '.name'));
-      const tx0 = x + 0.15 + iw + 0.25;
-      const tw = x + cw - tx0 - 0.2;
-      text(s, tx(p, '.name'), { x: tx0, y: cy + 0.25, w: tw, h: 0.4, fontFace: HEAD, fontSize: 20, bold: true, color: C.navy });
-      text(s, tx(p, '.tag'), { x: tx0, y: cy + 0.68, w: tw, h: 0.5, fontSize: 11, color: C.text3 });
-      text(s, 'VIEW SPECIFICATION  +', { x: tx0, y: cy + ch - 0.45, w: tw, h: 0.25, fontFace: HEAD, fontSize: 8.5, bold: true, color: C.steel, charSpacing: 1, wrap: false });
-      hotspot(s, x, cy, cw, ch, { slide: at(prodKey(i)), tooltip: `${tx(p, '.name')} — specification` });
+  const platform = (s: Slide, p: HTMLElement, x: number, y: number, w: number, h: number) => {
+    bracket(s, x, y, w, h);
+    const pad = 0.25;
+    const iw = 2.1;
+    const ih = 1.35;
+    image(s, srcOf(p, '.shot img'), x + pad, y + pad, iw, ih, 'cover', tx(p, '.name'));
+    text(s, [
+      { text: tx(p, '.name'), options: { fontFace: HEAD, fontSize: 20, bold: true, color: C.navy, breakLine: true } },
+      { text: tx(p, '.tag'), options: { fontSize: 11, color: C.text3 } },
+    ], { x: x + pad + iw + 0.25, y: y + pad, w: w - 2 * pad - iw - 0.25, h: ih, valign: 'middle' });
+
+    const iw2 = w - 2 * pad;
+    const [overview, ...rest] = all(p, '.row');
+    const ov = tx(overview, '.v');
+    const oy = y + pad + ih + 0.15;
+    const oh = textH(ov, 10.5, iw2);
+    text(s, ov, { x: x + pad, y: oy, w: iw2, h: oh, fontSize: 10.5 });
+
+    // the use case and sector rows are on the use-case matrix; the spec table is the detail kept here
+    const sy = oy + oh + 0.15;
+    const avail = y + h - pad - sy;
+    const spec = all(p, '.spec-table tr').map((tr) => all(tr, 'td').map((td) => clean(td.textContent)));
+    if (spec.length) {
+      s.addTable(
+        spec.map(([k, v]) => [{ text: k, options: { color: C.text3 } }, { text: v, options: { color: C.text1, bold: true } }]),
+        { x: x + pad, y: sy, w: iw2, colW: [iw2 * 0.46, iw2 * 0.54], fontFace: BODY, fontSize: 10, rowH: Math.min(0.27, avail / spec.length), margin: [0.02, 0.08, 0.02, 0.08], valign: 'middle', border: { type: 'solid', pt: 0.75, color: C.lineSoft }, fill: { color: C.paper } },
+      );
+    } else {
+      text(s, rest.flatMap((r, j): Run[] => [
+        { text: tx(r, '.k').toUpperCase(), options: { fontFace: HEAD, fontSize: 8, bold: true, color: C.steel, charSpacing: 1, breakLine: true } },
+        { text: tx(r, '.v'), options: { fontSize: 10.5, color: C.text2, paraSpaceAfter: 8, breakLine: j < rest.length - 1 } },
+      ]), { x: x + pad, y: sy, w: iw2, h: avail });
+    }
+  };
+  for (let i = 0; i < products.length; i += 2) {
+    page(`products-${i}`, 'products', (s) => {
+      const lede = i === 0 ? tx(pr, ':scope > .sec-lede').replace(/\s*Click[^.]*\.\s*$/, '') : undefined;
+      const y = header(s, prKicker, tx(pr, ':scope > .sec-title'), lede);
+      const pw = (CW - 0.3) / 2;
+      products.slice(i, i + 2).forEach((p, j) => platform(s, p, X0 + j * (pw + 0.3), y, pw, BOTTOM - y));
     });
-  });
-
-  products.forEach((p, i) => {
-    page(prodKey(i), 'products', (s) => {
-      eyebrow(s, prKicker);
-      text(s, [
-        { text: tx(p, '.name'), options: { fontFace: HEAD, fontSize: 28, bold: true, color: C.navy } },
-        { text: `   ${tx(p, '.tag')}`, options: { fontSize: 15, color: C.text3 } },
-      ], { x: X0, y: 0.75, w: CW, h: 0.55, valign: 'bottom' });
-
-      const y = 1.65;
-      const lw = 4.7;
-      const ih = lw / 1.5;
-      image(s, srcOf(p, '.shot img'), X0, y, lw, ih, 'cover', tx(p, '.name'));
-
-      // the accordion's siblings: back to the range, or straight across
-      const chips: Array<[string, Link, boolean]> = [
-        ['All products', { slide: at('products') }, false],
-        ...products.map((q, j): [string, Link, boolean] => [tx(q, '.name'), { slide: at(prodKey(j)) }, i === j]),
-      ];
-      let cx = X0;
-      const cy = y + ih + 0.3;
-      for (const [label, link, on] of chips) {
-        const cwid = (label.length * 9 * 0.62) / 72 + 0.35;
-        text(s, label.toUpperCase(), { x: cx, y: cy, w: cwid, h: 0.34, fontFace: HEAD, fontSize: 8.5, bold: true, charSpacing: 1, align: 'center', valign: 'middle', wrap: false, color: on ? C.paper : C.navy, fill: { color: on ? C.navy : C.paper }, line: { color: on ? C.navy : C.line, width: 0.75 } });
-        if (!on) hotspot(s, cx, cy, cwid, 0.34, { ...link, tooltip: label });
-        cx += cwid + 0.08;
-      }
-
-      const rx = X0 + lw + 0.45;
-      const rw = W - 0.55 - rx;
-      const rows = all(p, '.row');
-      const rowRuns: Run[] = rows.flatMap((r, j) => [
-        { text: tx(r, '.k').toUpperCase(), options: { fontFace: HEAD, fontSize: 8.5, bold: true, color: C.steel, charSpacing: 1, breakLine: true } },
-        { text: tx(r, '.v'), options: { fontSize: 12, color: C.text2, breakLine: j < rows.length - 1, paraSpaceAfter: 8 } },
-      ]);
-      const spec = all(p, '.spec-table tr').map((tr) => all(tr, 'td').map((td) => clean(td.textContent)));
-      const rh = rows.reduce((sum, r) => sum + 0.15 + textH(tx(r, '.v'), 12, rw) + 0.11, 0);
-      const ty = Math.min(y + rh + 0.25, BOTTOM - spec.length * 0.27);
-      text(s, rowRuns, { x: rx, y, w: rw, h: ty - y - 0.1 });
-      if (spec.length) {
-        s.addTable(
-          spec.map(([k, v]) => [
-            { text: k, options: { color: C.text3 } },
-            { text: v, options: { color: C.text1, bold: true } },
-          ]),
-          { x: rx, y: ty, w: rw, colW: [rw * 0.48, rw * 0.52], fontFace: BODY, fontSize: 11, rowH: 0.27, margin: [0.03, 0.08, 0.03, 0.08], valign: 'middle', border: { type: 'solid', pt: 0.75, color: C.lineSoft }, fill: { color: C.paper } },
-        );
-      }
-    });
-  });
+  }
 
   const [services, footage, usecases] = blocks(pr);
 
   page('services', 'products', (s) => {
     const y = header(s, prKicker, services?.label ?? '');
+    const lw = 5.7;
+    box(s, X0, y, lw, BOTTOM - y);
     const cells = all(services?.el, '.svc');
-    const cw = (CW - 0.25) / 2;
-    const ch = Math.min(2.1, (BOTTOM - y - 0.25) / 2);
-    cells.forEach((c, i) => {
-      const x = X0 + (i % 2) * (cw + 0.25);
-      const cy = y + Math.floor(i / 2) * (ch + 0.25);
-      box(s, x, cy, cw, ch);
-      text(s, tx(c, '.n'), { x: x + 0.3, y: cy + 0.3, w: 0.6, h: 0.4, fontFace: HEAD, fontSize: 18, bold: true, color: C.steel });
-      text(s, tx(c, 'h4'), { x: x + 1.0, y: cy + 0.3, w: cw - 1.3, h: 0.35, fontFace: HEAD, fontSize: 15, bold: true, color: C.navy });
-      text(s, tx(c, 'p'), { x: x + 1.0, y: cy + 0.75, w: cw - 1.3, h: ch - 0.95, fontSize: 13 });
-    });
-  });
+    text(s, cells.flatMap((c, i): Run[] => [
+      { text: `${tx(c, '.n')}   `, options: { fontFace: HEAD, fontSize: 12, bold: true, color: C.steel, paraSpaceAfter: 3 } },
+      { text: tx(c, 'h4'), options: { fontFace: HEAD, fontSize: 13.5, bold: true, color: C.navy, breakLine: true } },
+      { text: tx(c, 'p'), options: { fontSize: 12, color: C.text2, paraSpaceAfter: 14, breakLine: i < cells.length - 1 } },
+    ]), { x: X0 + 0.3, y: y + 0.2, w: lw - 0.6, h: BOTTOM - y - 0.4, valign: 'middle' });
 
-  page('footage', 'products', (s) => {
-    header(s, prKicker, footage?.label ?? '');
+    // the field footage sits beside the services it shows, still click-to-play
+    const vx = X0 + lw + 0.4;
+    const cw = W - 0.55 - vx;
+    eyebrow(s, footage?.label ?? '', y, vx, cw);
     const slots = all(footage?.el, '.video-slot');
-    const vw = (CW - 0.35 * (slots.length - 1)) / slots.length;
-    slots.forEach((v, i) => video(s, v, X0 + i * (vw + 0.35), 2.05, vw));
+    const vw = Math.min(cw, ((BOTTOM - y - 0.35 - 0.15 * (slots.length - 1)) / slots.length - 0.6) * (16 / 9));
+    let vy = y + 0.35;
+    for (const slot of slots) vy += video(s, slot, vx + (cw - vw) / 2, vy, vw) + 0.15;
   });
 
   page('usecases', 'products', (s) => {
@@ -499,7 +467,7 @@ export async function downloadPitchDeck() {
     text(s, tx(block, '.fin-note'), { x: X0, y: BOTTOM - 0.15, w: CW, h: 0.25, fontSize: 9.5, italic: true, color: C.text3 });
   });
 
-  // 03 — Technology
+  // 03 — Technology: the stack, then the loop it runs and the station that watches it
   const te = sec('technology');
   const teKicker = tx(te, ':scope > .eyebrow');
   page('technology', 'technology', (s) => {
@@ -520,26 +488,30 @@ export async function downloadPitchDeck() {
     const y = header(s, teKicker, blocks(te)[0]?.label ?? '');
     const cards = all(te, '.tcard:not(.tcard-wide)');
     const cw = (CW - 0.3 * (cards.length - 1)) / cards.length;
-    const ih = cw * 0.6;
-    const ch = Math.min(ih + 2.1, BOTTOM - y);
+    const ih = 1.45;
+    const ch = ih + 1.55;
     cards.forEach((c, i) => {
       const x = X0 + i * (cw + 0.3);
       box(s, x, y, cw, ch);
       image(s, srcOf(c), x, y, cw, ih, 'cover', one(c, 'img')?.getAttribute('alt') ?? undefined);
-      text(s, tx(c, '.n'), { x: x + 0.25, y: y + ih + 0.25, w: cw - 0.5, h: 0.3, fontFace: HEAD, fontSize: 11, bold: true, color: C.steel });
-      text(s, tx(c, 'h4'), { x: x + 0.25, y: y + ih + 0.55, w: cw - 0.5, h: 0.4, fontFace: HEAD, fontSize: 17, bold: true, color: C.navy });
-      text(s, tx(c, 'p'), { x: x + 0.25, y: y + ih + 1.0, w: cw - 0.5, h: ch - ih - 1.15, fontSize: 13 });
+      text(s, [
+        { text: `${tx(c, '.n')}   `, options: { fontFace: HEAD, fontSize: 10, bold: true, color: C.steel } },
+        { text: tx(c, 'h4'), options: { fontFace: HEAD, fontSize: 15, bold: true, color: C.navy, breakLine: true, paraSpaceAfter: 4 } },
+        { text: tx(c, 'p'), options: { fontSize: 11, color: C.text2 } },
+      ], { x: x + 0.22, y: y + ih + 0.15, w: cw - 0.44, h: ch - ih - 0.25 });
     });
-  });
 
-  page('tech-gcs', 'technology', (s) => {
     const card = one(te, '.tcard-wide');
-    const y = header(s, teKicker, tx(card, 'h4'));
-    const iw = 6.1;
-    const ih = Math.min(BOTTOM - y, iw / 1.6);
-    image(s, srcOf(card), X0, y, iw, ih, 'cover', one(card, 'img')?.getAttribute('alt') ?? undefined);
-    text(s, tx(card, '.n'), { x: X0 + iw + 0.4, y, w: CW - iw - 0.4, h: 0.3, fontFace: HEAD, fontSize: 11, bold: true, color: C.steel, charSpacing: 1 });
-    text(s, tx(card, 'p'), { x: X0 + iw + 0.4, y: y + 0.45, w: CW - iw - 0.4, h: ih - 0.45, fontSize: 14 });
+    const gy = y + ch + 0.3;
+    const gh = BOTTOM - gy;
+    const giw = gh * 1.6;
+    box(s, X0, gy, CW, gh);
+    image(s, srcOf(card), X0, gy, giw, gh, 'cover', one(card, 'img')?.getAttribute('alt') ?? undefined);
+    text(s, [
+      { text: `${tx(card, '.n')}   `, options: { fontFace: HEAD, fontSize: 10, bold: true, color: C.steel } },
+      { text: tx(card, 'h4'), options: { fontFace: HEAD, fontSize: 15, bold: true, color: C.navy, breakLine: true, paraSpaceAfter: 4 } },
+      { text: tx(card, 'p'), options: { fontSize: 11, color: C.text2 } },
+    ], { x: X0 + giw + 0.3, y: gy + 0.15, w: CW - giw - 0.55, h: gh - 0.3, valign: 'middle' });
   });
 
   // 04 — Market
@@ -570,47 +542,49 @@ export async function downloadPitchDeck() {
     text(s, tx(mk, '.fin-note'), { x: X0, y: BOTTOM - 0.2, w: CW, h: 0.25, fontSize: 9.5, italic: true, color: C.text3 });
   });
 
-  // 05 — Traction
+  // 05 — Traction: the counts, who and what, and the sites photographed on the day
   const tr = sec('traction');
-  const trKicker = tx(tr, ':scope > .eyebrow');
   page('traction', 'traction', (s) => {
-    const y = header(s, trKicker, tx(tr, ':scope > .sec-title'));
+    const y = header(s, tx(tr, ':scope > .eyebrow'), tx(tr, ':scope > .sec-title'));
     const nums = all(tr, '.trac-nums .tn');
     const nw = (CW - 0.12 * (nums.length - 1)) / nums.length;
     nums.forEach((n, i) => {
       const x = X0 + i * (nw + 0.12);
-      box(s, x, y, nw, 1.2);
-      text(s, tx(n, '.num'), { x: x + 0.18, y: y + 0.15, w: nw - 0.36, h: 0.5, fontFace: HEAD, fontSize: 26, bold: true, color: C.indigo });
-      text(s, tx(n, '.lbl'), { x: x + 0.18, y: y + 0.68, w: nw - 0.36, h: 0.45, fontSize: 10, color: C.text3 });
+      box(s, x, y, nw, 0.9);
+      text(s, tx(n, '.num'), { x: x + 0.15, y: y + 0.08, w: nw - 0.3, h: 0.42, fontFace: HEAD, fontSize: 22, bold: true, color: C.indigo });
+      text(s, tx(n, '.lbl'), { x: x + 0.15, y: y + 0.5, w: nw - 0.3, h: 0.35, fontSize: 9, color: C.text3 });
     });
-    const ny = y + 1.2 + 0.35;
-    eyebrow(s, blocks(tr)[0]?.label ?? '', ny);
-    const nh = pills(s, all(tr, '.name-strip li').map((li) => clean(li.textContent)), X0, ny + 0.32, CW, { pt: 11.5, fill: C.paper });
-    const cy = ny + 0.32 + nh + 0.35;
-    const cells = all(tr, ':scope > .grid-2 > .cell');
-    const cw = (CW - 0.25) / 2;
-    const ch = BOTTOM - cy;
-    cells.forEach((c, i) => {
-      const x = X0 + i * (cw + 0.25);
-      box(s, x, cy, cw, ch, C.paper2);
-      text(s, tx(c, 'h4'), { x: x + 0.3, y: cy + 0.22, w: cw - 0.6, h: 0.3, fontFace: HEAD, fontSize: 14, bold: true, color: C.navy });
-      const pillEls = all(c, '.pill');
-      if (pillEls.length) pills(s, pillEls.map((p) => clean(p.textContent)), x + 0.3, cy + 0.65, cw - 0.6, { pt: 10, fill: C.paper });
-      else text(s, tx(c, 'p'), { x: x + 0.3, y: cy + 0.62, w: cw - 0.6, h: ch - 0.75, fontSize: 12.5 });
-    });
-  });
 
-  page('traction-site', 'traction', (s) => {
-    const y = header(s, trKicker, blocks(tr)[1]?.label ?? '');
+    const [clients, site] = blocks(tr);
+    const lw = 5.4;
+    let ly = y + 0.9 + 0.3;
+    const gy = ly;
+    eyebrow(s, clients?.label ?? '', ly);
+    ly += 0.3 + pills(s, all(tr, '.name-strip li').map((li) => clean(li.textContent)), X0, ly + 0.3, lw, { pt: 9.5, fill: C.paper }) + 0.18;
+    for (const c of all(tr, ':scope > .grid-2 > .cell')) {
+      eyebrow(s, tx(c, 'h4'), ly, X0, lw);
+      ly += 0.3;
+      const pillEls = all(c, '.pill');
+      if (pillEls.length) {
+        ly += pills(s, pillEls.map((p) => clean(p.textContent)), X0, ly, lw, { pt: 9.5, fill: C.paper2 }) + 0.18;
+      } else {
+        const ph = textH(tx(c, 'p'), 10.5, lw);
+        text(s, tx(c, 'p'), { x: X0, y: ly, w: lw, h: ph, fontSize: 10.5 });
+        ly += ph + 0.18;
+      }
+    }
+
+    const rx = X0 + lw + 0.4;
+    const rw = W - 0.55 - rx;
+    eyebrow(s, site?.label ?? '', gy, rx, rw);
     const figs = all(tr, '.proof-figure');
-    const qw = (CW - 0.3) / 2;
-    const qh = (BOTTOM - y - 0.3) / 2;
+    const fw = (rw - 0.15) / 2;
+    const fh = Math.min(fw / 1.5, (BOTTOM - gy - 0.3 - 0.15 - 2 * 0.4) / 2);
     figs.forEach((f, i) => {
-      const x = X0 + (i % 2) * (qw + 0.3);
-      const fy = y + Math.floor(i / 2) * (qh + 0.3);
-      const iw = qh * 1.5;
-      image(s, srcOf(f), x, fy, iw, qh, 'cover', one(f, 'img')?.getAttribute('alt') ?? undefined);
-      text(s, tx(f, 'figcaption'), { x: x + iw + 0.2, y: fy, w: qw - iw - 0.2, h: qh, fontSize: 12, color: C.text2, valign: 'bottom' });
+      const x = rx + (i % 2) * (fw + 0.15);
+      const fy = gy + 0.3 + Math.floor(i / 2) * (fh + 0.4 + 0.15);
+      image(s, srcOf(f), x, fy, fw, fh, 'cover', one(f, 'img')?.getAttribute('alt') ?? undefined);
+      text(s, tx(f, 'figcaption'), { x, y: fy + fh + 0.05, w: fw, h: 0.35, fontSize: 9, color: C.text3 });
     });
   });
 
@@ -711,7 +685,7 @@ export async function downloadPitchDeck() {
 
     const sx = X0 + cw + 0.5;
     const sw = W - 0.55 - sx;
-    text(s, tx(ct, '.supported-by .lbl').toUpperCase(), { x: sx, y, w: sw, h: 0.25, fontFace: HEAD, fontSize: 10, bold: true, color: C.steel, charSpacing: 2 });
+    eyebrow(s, tx(ct, '.supported-by .lbl'), y, sx, sw);
     pills(s, all(ct, '.sb-pills span').map((p) => clean(p.textContent)), sx, y + 0.35, sw, { pt: 11, fill: C.paper });
 
     const foot = one(ct, '.foot-mark');
