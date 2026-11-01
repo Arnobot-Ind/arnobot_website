@@ -1,26 +1,8 @@
 import postgres from "postgres";
 import { QUESTION_BANK } from "./questions";
-import { randomId } from "./auth";
+import { OPEN_ROLES } from "../data/careers";
 
-/** Roles seeded on first run. `skills` are question categories in the bank. */
-const DEFAULT_ROLES: { name: string; skills: string[] }[] = [
-  {
-    name: "Robotics Software Engineer",
-    skills: ["Coding", "Control Theory", "Sensor Integration", "Aptitude & General"],
-  },
-  {
-    name: "Embedded Systems Engineer",
-    skills: ["Microcontrollers", "Sensor Integration", "Coding", "Aptitude & General"],
-  },
-  {
-    name: "Mechanical Design Engineer",
-    skills: ["Mechanical Design", "Kinematics", "Aptitude & General"],
-  },
-  {
-    name: "Controls Engineer",
-    skills: ["Control Theory", "Kinematics", "Sensor Integration", "Aptitude & General"],
-  },
-];
+
 
 /**
  * Single shared Postgres client. Works with any Postgres provider via a
@@ -156,19 +138,15 @@ async function initSchema(): Promise<void> {
     )
   `;
 
-  // Seed questions only when the table is empty.
-  // Read the row defensively rather than destructuring: COUNT always returns
-  // one row, but `noUncheckedIndexedAccess` cannot know that, and treating a
-  // missing row as "0" would re-seed a table that already has rows.
-  const questionCountRows = await sql<{ count: string }[]>`
-    SELECT COUNT(*)::text AS count FROM questions
-  `;
-  const count = questionCountRows[0]?.count;
-  if (count !== undefined && Number(count) === 0 && QUESTION_BANK.length > 0) {
-    // Insert one row at a time so `options` lands as a real jsonb ARRAY
-    // (via sql.json) rather than a double-encoded json string.
+  // Seed every bank category that has no questions yet (so new categories
+  // reach an already-populated database without touching existing rows).
+  const haveRows = await sql<{ category: string }[]>`SELECT DISTINCT category FROM questions`;
+  const have = new Set(haveRows.map((r) => r.category));
+  const missing = QUESTION_BANK.filter((q) => !have.has(q.category));
+  if (missing.length > 0) {
+    // One row at a time so `options` lands as a real jsonb ARRAY (sql.json).
     await sql.begin(async (tx) => {
-      for (const q of QUESTION_BANK) {
+      for (const q of missing) {
         await tx`
           INSERT INTO questions (category, difficulty, question, image, options, correct, active)
           VALUES (${q.category}, ${q.difficulty ?? "medium"}, ${q.question},
@@ -178,17 +156,15 @@ async function initSchema(): Promise<void> {
     });
   }
 
-  // Seed default roles only when the table is empty.
-  const roleCountRows = await sql<{ count: string }[]>`
-    SELECT COUNT(*)::text AS count FROM roles
-  `;
-  const roleCount = roleCountRows[0]?.count;
-  if (roleCount !== undefined && Number(roleCount) === 0) {
-    for (const r of DEFAULT_ROLES) {
-      await sql`
-        INSERT INTO roles (id, name, skills, active)
-        VALUES (${randomId()}, ${r.name}, ${sql.json(r.skills)}, TRUE)
-      `;
-    }
+  // Exam roles mirror the careers site (src/data/careers.ts) exactly: upsert
+  // every open role by slug, and retire any role no longer listed there.
+  const slugs = OPEN_ROLES.map((r) => r.slug);
+  for (const r of OPEN_ROLES) {
+    await sql`
+      INSERT INTO roles (id, name, skills, active)
+      VALUES (${r.slug}, ${`${r.title} – ${r.tags[1]}`}, ${sql.json([...r.skills])}, TRUE)
+      ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, skills = EXCLUDED.skills, active = TRUE
+    `;
   }
+  await sql`UPDATE roles SET active = FALSE WHERE id <> ALL(${slugs})`;
 }

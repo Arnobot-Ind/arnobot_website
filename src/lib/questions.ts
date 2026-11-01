@@ -22,7 +22,10 @@ export type Category =
   | "Coding"
   | "Mechanical Design"
   | "Sensor Integration"
-  | "Aptitude & General";
+  | "Aptitude & General"
+  | "CAD & Design"
+  | "Electronics"
+  | "Manufacturing";
 
 export type SeedQuestion = {
   category: Category;
@@ -181,4 +184,44 @@ export const QUESTION_BANK: SeedQuestion[] = [
   { category: "Kinematics", difficulty: "medium", image: "/diagrams/two-link-arm.svg", question: "For the arm shown, computing the end-effector position from the two joint angles (J1, J2) is called:", options: ["Inverse kinematics", "Forward kinematics", "Inverse dynamics", "Trajectory smoothing"], correct: 1 },
   { category: "Microcontrollers", difficulty: "medium", image: "/diagrams/h-bridge.svg", question: "In the H-bridge shown, turning ON the diagonal pair S1 and S4 (with S2 and S3 off) will:", options: ["Short the supply to ground", "Drive the motor in one direction", "Only brake the motor", "Have no effect on the motor"], correct: 1 },
   { category: "Microcontrollers", difficulty: "hard", image: "/diagrams/h-bridge.svg", question: "In the H-bridge shown, switching ON S1 and S2 (both switches on the same side) at the same time would:", options: ["Reverse the motor safely", "Short V+ to GND (shoot-through)", "Double the motor torque", "Filter electrical noise"], correct: 1 },
+
+  // ───────────── CAD & Design ─────────────
+  { category: "CAD & Design", question: "In a parametric CAD sketch, a fully defined sketch means:", options: ["It has no geometry", "Every dimension and constraint is set so nothing can move", "It is saved to disk", "It uses only circles"], correct: 1 },
+  { category: "CAD & Design", question: "A GD&T flatness callout controls:", options: ["Diameter of a hole", "How far a surface may deviate between two parallel planes", "Thread pitch", "Surface colour"], correct: 1 },
+  { category: "CAD & Design", question: "A fillet on an edge is:", options: ["A sharp chamfer", "A rounded blend between two faces", "A threaded hole", "A cut-through slot"], correct: 1 },
+  { category: "CAD & Design", question: "Which view type shows hidden internal features by cutting the part?", options: ["Isometric view", "Section view", "Exploded view", "Perspective view"], correct: 1 },
+  { category: "CAD & Design", question: "Draft angles on moulded or cast parts are added to:", options: ["Increase weight", "Let the part release from the mould", "Improve colour", "Reduce part count"], correct: 1 },
+  { category: "CAD & Design", question: "In an assembly, a 'concentric' mate aligns:", options: ["Two flat faces", "The axes of two circular features", "Two edges at 90°", "Part mass"], correct: 1 },
+  { category: "CAD & Design", question: "A clearance fit between shaft and hole means:", options: ["The shaft is always larger than the hole", "The shaft is always smaller than the hole", "They are welded", "Tolerance is zero"], correct: 1 },
+  { category: "CAD & Design", question: "Which file format is a neutral CAD exchange format?", options: ["STEP", "DOCX", "MP4", "WAV"], correct: 0 },
+  { category: "CAD & Design", question: "A bill of materials (BOM) lists:", options: ["Only fasteners", "All parts and quantities in an assembly", "Operator names", "Machine speeds"], correct: 1 },
+  { category: "CAD & Design", question: "Design for Assembly (DFA) aims to:", options: ["Maximise part count", "Reduce parts and make assembly simple and error-proof", "Use only custom screws", "Avoid drawings"], correct: 1 },
+  { category: "CAD & Design", question: "A 'shell' feature in CAD is used to:", options: ["Fill a solid", "Hollow out a solid leaving a uniform wall thickness", "Add text", "Mirror a part"], correct: 1 },
+  { category: "CAD & Design", question: "Stress concentrations at internal sharp corners are reduced by:", options: ["Making the corner sharper", "Adding a radius", "Removing the radius", "Painting the part"], correct: 1 },
+  // ───────────── Electronics ─────────────
+  { category: "Electronics", question: "Ohm's law relates:", options: ["V = I × R", "P = V / R²", "I = V × R", "R = V × I"], correct: 0 },
+  { category: "Electronics", question: "A decoupling capacitor near an IC's supply pin mainly:", options: ["Raises the voltage", "Supplies local transient current and filters noise", "Stores data", "Acts as a fuse"], correct: 1 },
+  { category: "Electronics", question: "A pull-up resistor on a digital input:", options: ["Leaves it floating", "Holds it at logic high when nothing drives it low", "Converts it to analog", "Limits current to zero"], correct: 1 },
+  { category: "Electronics", question: "A flyback diode across a motor or relay coil protects against:", options: ["Overheating of the diode", "Voltage spikes when the coil current is switched off", "Low battery", "EMI from the antenna"], correct: 1 },
+  { category: "Electronics", question: "A buck converter:", options: ["Steps voltage up", "Steps voltage down efficiently", "Converts AC to DC only", "Isolates grounds"], correct: 1 },
+  { category: "Electronics", question: "The main advantage of a MOSFET switch over a BJT for power switching is:", options: ["Higher base current", "Very low gate drive current and low on-resistance", "It needs no ground", "It is always cheaper"], correct: 1 },
+  { category: "Electronics", question: "Differential signalling (e.g. CAN, RS-485) is used because it:", options: ["Needs one wire", "Rejects common-mode noise over long cables", "Uses less power than any other method", "Needs no termination"], correct: 1 },
+  { category: "Electronics", question: "A 100 Ω resistor carries 0.1 A. Power dissipated is:", options: ["0.1 W", "1 W", "10 W", "100 W"], correct: 1 },
+  { category: "Electronics", question: "The purpose of a ground plane on a PCB is:", options: ["Decoration", "Provide a low-impedance return path and reduce noise", "Increase trace length", "Hold components"], correct: 1 },
+  { category: "Electronics", question: "An ADC with 12 bits and a 3.3 V reference has a resolution of about:", options: ["3.3 V", "0.8 mV", "12 mV", "0.1 V"], correct: 1 },
+  { category: "Electronics", question: "A Li-ion cell should never be:", options: ["Charged with CC/CV", "Over-discharged or over-charged without protection", "Monitored by a BMS", "Stored partially charged"], correct: 1 },
+  { category: "Electronics", question: "Which protocol uses a shared two-wire bus with device addresses?", options: ["UART", "I²C", "PWM", "SPI chip-select only"], correct: 1 },
+  // ───────────── Manufacturing ─────────────
+  { category: "Manufacturing", question: "CNC machining is a:", options: ["Additive process", "Subtractive process", "Casting process", "Forming-only process"], correct: 1 },
+  { category: "Manufacturing", question: "Sheet-metal bending uses a 'bend allowance' to:", options: ["Pick colour", "Compute the flat length needed so the bent part hits its dimensions", "Set price", "Choose the press"], correct: 1 },
+  { category: "Manufacturing", question: "Which process suits low-volume, complex plastic prototypes?", options: ["Injection moulding with hardened steel tooling", "FDM / SLA 3D printing", "Die casting", "Forging"], correct: 1 },
+  { category: "Manufacturing", question: "Tolerance stack-up analysis is done to:", options: ["Reduce paint cost", "Check whether accumulated tolerances still let parts assemble and function", "Count parts", "Set shipping rates"], correct: 1 },
+  { category: "Manufacturing", question: "TIG welding is generally preferred for:", options: ["Thick structural steel at high speed", "Thin material and clean, precise welds on aluminium and stainless", "Cutting metal", "Hardening steel"], correct: 1 },
+  { category: "Manufacturing", question: "A jig or fixture is used to:", options: ["Increase part weight", "Hold and locate the workpiece repeatably during machining or assembly", "Store tools", "Measure voltage"], correct: 1 },
+  { category: "Manufacturing", question: "Which is a typical anodising purpose?", options: ["Soften aluminium", "Create a hard, corrosion-resistant oxide layer on aluminium", "Join two plates", "Cut threads"], correct: 1 },
+  { category: "Manufacturing", question: "A first-article inspection verifies:", options: ["Daily output count", "The first produced part against drawing requirements", "Worker attendance", "Supplier price"], correct: 1 },
+  { category: "Manufacturing", question: "Lean manufacturing aims to:", options: ["Add inventory", "Eliminate waste and non-value-adding steps", "Increase setup time", "Avoid standard work"], correct: 1 },
+  { category: "Manufacturing", question: "A Cpk value below 1.0 indicates:", options: ["A capable, centred process", "The process is not capable of consistently meeting spec", "Zero defects", "No variation"], correct: 1 },
+  { category: "Manufacturing", question: "Laser cutting is limited mainly by:", options: ["Colour of the part", "Material type, thickness and edge quality needs", "Part weight", "Ambient noise"], correct: 1 },
+  { category: "Manufacturing", question: "Torque-controlled fastening helps ensure:", options: ["Faster production only", "Consistent clamp load and avoids over- or under-tightening", "Thread colour", "Lower BOM count"], correct: 1 },
 ];
