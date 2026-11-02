@@ -10,7 +10,7 @@ import styles from './open-positions.module.css';
 
 export const metadata: Metadata = {
   title: 'Open Positions',
-  description: `${ROLE_COUNT} open roles on the ARNOBOT engineering team in Ahmedabad — hardware, autonomy, research and commercial.`,
+  description: `${ROLE_COUNT} open roles on the ARNOBOT engineering team in Ahmedabad — ${ROLE_GROUPS.map((g) => g.discipline.toLowerCase()).join(', ')}; each open as an internship or full-time.`,
 };
 
 /** The still behind the hero — the assembly floor, the people the reader would join. */
@@ -51,12 +51,15 @@ export default function OpenPositionsPage() {
             </p>
             <ul className={cn('meta-line', styles.heroMeta)}>
               <li>Ahmedabad, India</li>
-              <li>Full-time and internships</li>
+              <li>Intern / Full-time</li>
               <li>{ROLE_GROUPS.length} disciplines</li>
             </ul>
             <div className={styles.heroActions}>
               <a href="#roles" className="btn btn-light">
                 See the roles
+              </a>
+              <a href="/career/poster.pdf" download className="btn btn-outline">
+                Download poster
               </a>
               <Link href="/career" className="btn btn-outline">
                 Why join {SITE.name}
@@ -77,9 +80,14 @@ export default function OpenPositionsPage() {
               Send an open application and tell us what you would build. We hire for the person more often than for the
               posting.
             </p>
-            <a href="#apply" className="btn">
-              Open application
-            </a>
+            <div className={styles.rolesFootActions}>
+              <a href="/career/poster.pdf" download className="btn btn-outline">
+                Download poster (PDF)
+              </a>
+              <a href="#apply" className="btn">
+                Open application
+              </a>
+            </div>
           </div>
         </div>
       </section>

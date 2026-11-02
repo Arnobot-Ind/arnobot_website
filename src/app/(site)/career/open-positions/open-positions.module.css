@@ -293,6 +293,12 @@
   background: var(--wash);
 }
 
+.rolesFootActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .rolesFootText {
   margin: 0;
   font-size: var(--fs-body);

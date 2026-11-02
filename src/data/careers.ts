@@ -24,7 +24,9 @@ export interface RoleGroup {
 }
 
 /** Open roles, grouped by discipline, in the order the pages list them.
- *  Every role is open as both a full-time position and an internship, onsite. */
+ *  Every role is open as an internship or a full-time position, onsite. The
+ *  careers page, the exam's roles table and the downloadable poster
+ *  (/career/poster.pdf) all read this one list. */
 export const ROLE_GROUPS: readonly RoleGroup[] = [
   {
     slug: 'design',
@@ -34,14 +36,7 @@ export const ROLE_GROUPS: readonly RoleGroup[] = [
         slug: 'cad-designer',
         title: 'CAD Designer',
         body: 'Part and assembly modelling for ARNOBOT platforms — drawings, tolerances and release-ready CAD that the shop floor can build from.',
-        tags: ['Onsite · Ahmedabad', 'Full-time', '1 – 5 years'],
-        skills: ['CAD & Design', 'Mechanical Design', 'Manufacturing', 'Aptitude & General'],
-      },
-      {
-        slug: 'cad-designer-intern',
-        title: 'CAD Designer Intern',
-        body: 'Part and assembly modelling for ARNOBOT platforms — drawings, tolerances and release-ready CAD that the shop floor can build from. Open to final-year students and recent graduates.',
-        tags: ['Onsite · Ahmedabad', 'Internship', '3 – 6 months'],
+        tags: ['Onsite · Ahmedabad', 'Intern / Full-time'],
         skills: ['CAD & Design', 'Mechanical Design', 'Manufacturing', 'Aptitude & General'],
       },
     ],
@@ -54,28 +49,14 @@ export const ROLE_GROUPS: readonly RoleGroup[] = [
         slug: 'electronics-engineer',
         title: 'Electronics Engineer',
         body: 'Board design, power and signal integrity, bring-up and test for the electronics inside our robots.',
-        tags: ['Onsite · Ahmedabad', 'Full-time', '1 – 5 years'],
-        skills: ['Electronics', 'Microcontrollers', 'Sensor Integration', 'Aptitude & General'],
-      },
-      {
-        slug: 'electronics-engineer-intern',
-        title: 'Electronics Engineer Intern',
-        body: 'Board design, power and signal integrity, bring-up and test for the electronics inside our robots. Open to final-year students and recent graduates.',
-        tags: ['Onsite · Ahmedabad', 'Internship', '3 – 6 months'],
+        tags: ['Onsite · Ahmedabad', 'Intern / Full-time'],
         skills: ['Electronics', 'Microcontrollers', 'Sensor Integration', 'Aptitude & General'],
       },
       {
         slug: 'robot-electrical-engineer',
         title: 'Robot Electrical Engineer',
         body: 'Harnessing, power distribution, motor drives and sensor wiring that survive vibration, dust and wash-down.',
-        tags: ['Onsite · Ahmedabad', 'Full-time', '1 – 5 years'],
-        skills: ['Electronics', 'Microcontrollers', 'Control Theory', 'Sensor Integration'],
-      },
-      {
-        slug: 'robot-electrical-engineer-intern',
-        title: 'Robot Electrical Engineer Intern',
-        body: 'Harnessing, power distribution, motor drives and sensor wiring that survive vibration, dust and wash-down. Open to final-year students and recent graduates.',
-        tags: ['Onsite · Ahmedabad', 'Internship', '3 – 6 months'],
+        tags: ['Onsite · Ahmedabad', 'Intern / Full-time'],
         skills: ['Electronics', 'Microcontrollers', 'Control Theory', 'Sensor Integration'],
       },
     ],
@@ -88,28 +69,14 @@ export const ROLE_GROUPS: readonly RoleGroup[] = [
         slug: 'manufacturing-engineer',
         title: 'Manufacturing Engineer',
         body: 'Process planning, fixtures, assembly and quality — turning a released design into repeatable hardware.',
-        tags: ['Onsite · Ahmedabad', 'Full-time', '1 – 5 years'],
-        skills: ['Manufacturing', 'Mechanical Design', 'CAD & Design', 'Aptitude & General'],
-      },
-      {
-        slug: 'manufacturing-engineer-intern',
-        title: 'Manufacturing Engineer Intern',
-        body: 'Process planning, fixtures, assembly and quality — turning a released design into repeatable hardware. Open to final-year students and recent graduates.',
-        tags: ['Onsite · Ahmedabad', 'Internship', '3 – 6 months'],
+        tags: ['Onsite · Ahmedabad', 'Intern / Full-time'],
         skills: ['Manufacturing', 'Mechanical Design', 'CAD & Design', 'Aptitude & General'],
       },
       {
         slug: 'robot-design-manufacturing',
         title: 'Robot Design & Manufacturing Engineer',
         body: 'Own a robot subsystem from concept and design-for-manufacture through prototype build and testing.',
-        tags: ['Onsite · Ahmedabad', 'Full-time', '1 – 5 years'],
-        skills: ['Mechanical Design', 'Manufacturing', 'CAD & Design', 'Kinematics'],
-      },
-      {
-        slug: 'robot-design-manufacturing-intern',
-        title: 'Robot Design & Manufacturing Engineer Intern',
-        body: 'Own a robot subsystem from concept and design-for-manufacture through prototype build and testing. Open to final-year students and recent graduates.',
-        tags: ['Onsite · Ahmedabad', 'Internship', '3 – 6 months'],
+        tags: ['Onsite · Ahmedabad', 'Intern / Full-time'],
         skills: ['Mechanical Design', 'Manufacturing', 'CAD & Design', 'Kinematics'],
       },
     ],
@@ -122,14 +89,7 @@ export const ROLE_GROUPS: readonly RoleGroup[] = [
         slug: 'robotics-engineer',
         title: 'Robotics Engineer',
         body: 'Mechanical design and integration across the SAIBYA, NEXUS and ATM platforms — drivetrain, enclosure, payload mounts, and the tests that prove them.',
-        tags: ['Onsite · Ahmedabad', 'Full-time', '1 – 5 years'],
-        skills: ['Kinematics', 'Control Theory', 'Coding', 'Sensor Integration', 'Mechanical Design', 'Aptitude & General'],
-      },
-      {
-        slug: 'robotics-engineer-intern',
-        title: 'Robotics Engineer Intern',
-        body: 'Mechanical design and integration across the SAIBYA, NEXUS and ATM platforms — drivetrain, enclosure, payload mounts, and the tests that prove them. Open to final-year students and recent graduates.',
-        tags: ['Onsite · Ahmedabad', 'Internship', '3 – 6 months'],
+        tags: ['Onsite · Ahmedabad', 'Intern / Full-time'],
         skills: ['Kinematics', 'Control Theory', 'Coding', 'Sensor Integration', 'Mechanical Design', 'Aptitude & General'],
       },
     ],
