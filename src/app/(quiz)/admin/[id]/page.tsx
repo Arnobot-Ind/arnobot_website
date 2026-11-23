@@ -11,7 +11,10 @@ import {
   Detail,
   ProgressEditor,
   ResumeViewer,
+  TEMPLATES,
+  defaultTemplate,
   draftFor,
+  type Template,
   type Applicant,
 } from "../_shared";
 
@@ -20,7 +23,7 @@ export default function ApplicantPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [a, setA] = useState<Applicant | null | "missing" | "unauthorized">(null);
-  const [compose, setCompose] = useState<{ subject: string; body: string } | null>(null);
+  const [compose, setCompose] = useState<{ template: Template; subject: string; body: string } | null>(null);
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState("");
   const [view, setView] = useState<"overview" | "emails">("overview");
@@ -83,7 +86,7 @@ export default function ApplicantPage() {
     const res = await fetch("/api/admin/applicants", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, ...compose }),
+      body: JSON.stringify({ id, subject: compose.subject, body: compose.body }),
     });
     setSending(false);
     if (res.ok) {
@@ -163,7 +166,8 @@ export default function ApplicantPage() {
             <button
               onClick={() => {
                 setMsg("");
-                setCompose(compose ? null : draftFor(a));
+                const t = defaultTemplate(a);
+                setCompose(compose ? null : { template: t, ...draftFor(a, t) });
               }}
               className={`${btn} border-navy bg-navy text-white hover:bg-navy2`}
             >
@@ -179,6 +183,22 @@ export default function ApplicantPage() {
             <div className="mt-5 rounded-xl border border-line bg-surfaceAlt/50 p-4">
               <div className="text-xs text-muted mb-2">
                 From contact@arnobot.in to <b className="text-ink">{a.email}</b>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted mr-1">Template</span>
+                {(Object.keys(TEMPLATES) as Template[]).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setCompose({ template: t, ...draftFor(a, t) })}
+                    className={`text-xs font-semibold rounded-full px-3 py-1.5 border transition ${
+                      compose.template === t
+                        ? "bg-navy text-white border-navy"
+                        : "bg-white text-body border-line hover:border-steel/60"
+                    }`}
+                  >
+                    {TEMPLATES[t]}
+                  </button>
+                ))}
               </div>
               <input
                 value={compose.subject}

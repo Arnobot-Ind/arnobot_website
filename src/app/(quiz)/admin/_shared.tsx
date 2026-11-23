@@ -144,25 +144,42 @@ export function ResumeViewer({ a }: { a: Applicant }) {
 }
 
 
-export /** A reply drafted for the candidate's decision; editable before sending. */
-function draftFor(a: Applicant): { subject: string; body: string } {
-  const first = a.name.split(" ")[0] || a.name;
-  const role = a.role ? ` for the ${a.role} role` : "";
-  const [subject, body] =
-    a.decision === "accepted"
-      ? [
-          "Your ARNOBOT application: next steps",
-          `Hi ${first},\n\nThank you for applying to ARNOBOT${role}. We are pleased to tell you that you have been shortlisted. We will be in touch shortly to arrange the next round.\n\nRegards,\nARNOBOT Hiring Team`,
-        ]
-      : a.decision === "rejected"
-        ? [
-            "Your ARNOBOT application",
-            `Hi ${first},\n\nThank you for applying to ARNOBOT${role} and for the time you put into the assessment. After careful review, we will not be moving forward with your application at this time. We wish you the very best.\n\nRegards,\nARNOBOT Hiring Team`,
-          ]
-        : ["Your ARNOBOT application", `Hi ${first},\n\n`];
-  return { subject, body };
+/** The three ready-made candidate emails offered in the compose box. */
+export const TEMPLATES = {
+  accept: "✓ Accept",
+  reject: "✕ Reject",
+  evaluate: "↻ Further evaluation",
+} as const;
+export type Template = keyof typeof TEMPLATES;
+
+/** The template that fits the candidate's current decision. */
+export function defaultTemplate(a: Applicant): Template {
+  return a.decision === "accepted" ? "accept" : a.decision === "rejected" ? "reject" : "evaluate";
 }
 
+/** A prefilled email for the chosen template; editable before sending. */
+export function draftFor(a: Applicant, template: Template): { subject: string; body: string } {
+  const first = a.name.split(" ")[0] || a.name;
+  const role = a.role ? ` for the ${a.role} role` : "";
+  const sign = "\n\nRegards,\nARNOBOT Hiring Team";
+  switch (template) {
+    case "accept":
+      return {
+        subject: "Your ARNOBOT application: you've been shortlisted",
+        body: `Hi ${first},\n\nThank you for applying to ARNOBOT${role}. We are pleased to tell you that you have been shortlisted. Our team will be in touch shortly to arrange the next round.${sign}`,
+      };
+    case "reject":
+      return {
+        subject: "Your ARNOBOT application",
+        body: `Hi ${first},\n\nThank you for applying to ARNOBOT${role} and for the time you put into the assessment. After careful review, we will not be moving forward with your application at this time. We wish you the very best.${sign}`,
+      };
+    case "evaluate":
+      return {
+        subject: "Your ARNOBOT application: further evaluation",
+        body: `Hi ${first},\n\nThank you for applying to ARNOBOT${role} and for completing the assessment on our hiring platform. We would like to evaluate your profile further before making a decision. A member of our team will contact you shortly to arrange the next step; in the meantime, please reply to this email with your availability over the coming week.${sign}`,
+      };
+  }
+}
 
 export function Detail({ label, value }: { label: string; value: string | number | null }) {
   return (
