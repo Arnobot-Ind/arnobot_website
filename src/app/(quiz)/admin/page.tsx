@@ -295,22 +295,22 @@ function ApplicantsTab({
           placeholder="Search name, email, phone, college…"
           className="flex-1 min-w-[220px] rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-steel focus:ring-4 focus:ring-steel/15"
         />
-        <FilterSelect label="Role" value={f.role} onChange={(role) => setF({ ...f, role })} options={roles} />
+        <FilterSelect label="roles" value={f.role} onChange={(role) => setF({ ...f, role })} options={roles} />
         <FilterSelect
-          label="Status"
+          label="statuses"
           value={f.status}
           onChange={(status) => setF({ ...f, status })}
           options={[...new Set(applicants.map((a) => a.status))].sort()}
         />
         <FilterSelect
-          label="Result"
+          label="results"
           value={f.result}
           onChange={(result) => setF({ ...f, result })}
           options={[["pass", "PASS"], ["fail", "FAIL"], ["none", "Not taken"]]}
         />
-        <FilterSelect label="Stage" value={f.stage} onChange={(stage) => setF({ ...f, stage })} options={[...STAGES]} />
+        <FilterSelect label="stages" value={f.stage} onChange={(stage) => setF({ ...f, stage })} options={[...STAGES]} />
         <FilterSelect
-          label="Decision"
+          label="decisions"
           value={f.decision}
           onChange={(decision) => setF({ ...f, decision })}
           options={["pending", "accepted", "rejected"]}
@@ -529,7 +529,7 @@ function SortTh({
   );
 }
 
-/** A compact <select> whose first option ("All …") clears the filter. */
+/** A compact <select> whose first option ("All <label>") clears the filter; label is plural. */
 function FilterSelect({
   label,
   value,
@@ -545,12 +545,12 @@ function FilterSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      aria-label={`Filter by ${label.toLowerCase()}`}
+      aria-label={`Filter by ${label}`}
       className={`rounded-lg border px-3 py-2 text-sm outline-none focus:border-steel max-w-[220px] ${
         value ? "border-navy text-navy font-semibold bg-navy/5" : "border-line text-body bg-white"
       }`}
     >
-      <option value="">All {label.toLowerCase()}s</option>
+      <option value="">All {label}</option>
       {options.map((o) => {
         const [v, text] = typeof o === "string" ? [o, o] : o;
         return (
