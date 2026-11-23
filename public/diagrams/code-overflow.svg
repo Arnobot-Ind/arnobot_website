@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 190" width="480" height="190">
+  <rect x="0" y="0" width="480" height="190" rx="14" fill="#14123a"/>
+  <g font-family="ui-monospace, Menlo, Consolas, monospace" font-size="16" fill="#e6e8f5" xml:space="preserve">
+    <text x="28" y="44"><tspan fill="#8fb4ff">uint8_t</tspan> count = <tspan fill="#ffcf7a">250</tspan>;</text>
+    <text x="28" y="74"><tspan fill="#c792ea">for</tspan> (<tspan fill="#8fb4ff">int</tspan> i = <tspan fill="#ffcf7a">0</tspan>; i &lt; <tspan fill="#ffcf7a">10</tspan>; i++) {</text>
+    <text x="68" y="104">count++;</text>
+    <text x="28" y="134">}</text>
+    <text x="28" y="164" fill="#7f86a8">// value of count here?</text>
+  </g>
+</svg>

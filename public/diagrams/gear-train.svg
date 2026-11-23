@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 230" width="480" height="230" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect x="0" y="0" width="480" height="230" rx="14" fill="#eef1fb"/>
+  <rect x="22" y="92" width="76" height="46" rx="6" fill="#375E9D" stroke="#1b1550" stroke-width="2"/>
+  <text x="34" y="120" fill="#ffffff" font-size="13" font-weight="800">MOTOR</text>
+  <text x="22" y="82" fill="#1b1550" font-size="13" font-weight="700">1500 rpm</text>
+  <line x1="98" y1="115" x2="170" y2="115" stroke="#1b1550" stroke-width="5"/>
+  <circle cx="170" cy="115" r="38" fill="none" stroke="#1b1550" stroke-width="9" stroke-dasharray="5 5"/>
+  <circle cx="170" cy="115" r="33" fill="#ffffff" stroke="#1b1550" stroke-width="2"/>
+  <circle cx="170" cy="115" r="5" fill="#1b1550"/>
+  <text x="154" y="102" fill="#230C75" font-size="16" font-weight="800">A</text>
+  <circle cx="292" cy="115" r="86" fill="none" stroke="#1b1550" stroke-width="9" stroke-dasharray="5.2 5.2"/>
+  <circle cx="292" cy="115" r="81" fill="#ffffff" stroke="#1b1550" stroke-width="2"/>
+  <circle cx="292" cy="115" r="6" fill="#1b1550"/>
+  <text x="282" y="80" fill="#230C75" font-size="16" font-weight="800">B</text>
+  <line x1="292" y1="115" x2="440" y2="115" stroke="#1b1550" stroke-width="5"/>
+  <text x="388" y="105" fill="#1b1550" font-size="12" font-weight="700">output</text>
+  <g fill="#1b1550" font-size="13" font-weight="700">
+    <text x="130" y="178">20 teeth</text>
+    <text x="262" y="160">60 teeth</text>
+  </g>
+</svg>

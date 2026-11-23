@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 240" width="480" height="240" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect x="0" y="0" width="480" height="240" rx="14" fill="#eef1fb"/>
+  <g stroke="#1b1550" stroke-width="2" fill="none">
+    <line x1="60" y1="200" x2="450" y2="200"/>
+    <line x1="60" y1="200" x2="60" y2="24"/>
+  </g>
+  <g stroke="#375E9D" stroke-width="1.4" fill="none" stroke-dasharray="6 5">
+    <line x1="60" y1="80" x2="450" y2="80"/>
+  </g>
+  <g stroke="#9aa3c7" stroke-width="1.2" fill="none" stroke-dasharray="2 4">
+    <line x1="60" y1="44" x2="150" y2="44"/>
+    <line x1="60" y1="140" x2="450" y2="140"/>
+  </g>
+  <path d="M60,200 C90,200 110,44 150,44 C185,44 195,100 220,100 C245,100 255,72 280,72 C305,72 320,82 350,80 L445,80" stroke="#230C75" stroke-width="3" fill="none"/>
+  <g fill="#1b1550" font-size="12" font-weight="700" text-anchor="end">
+    <text x="54" y="204">0</text>
+    <text x="54" y="144">0.5</text>
+    <text x="54" y="84">1.0</text>
+    <text x="54" y="48">1.3</text>
+  </g>
+  <g fill="#1b1550" font-size="12" font-weight="700">
+    <text x="360" y="72">setpoint</text>
+    <text x="156" y="38">peak</text>
+    <text x="380" y="222">time →</text>
+    <text x="68" y="20">output</text>
+  </g>
+</svg>

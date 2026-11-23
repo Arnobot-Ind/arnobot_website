@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" width="480" height="200" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect x="0" y="0" width="480" height="200" rx="14" fill="#eef1fb"/>
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#1b1550"/>
+    </marker>
+  </defs>
+  <g stroke="#1b1550" stroke-width="2.2" fill="none">
+    <!-- input -->
+    <line x1="18" y1="92" x2="64" y2="92" marker-end="url(#ar)"/>
+    <!-- summing junction -->
+    <circle cx="88" cy="92" r="18" fill="#ffffff"/>
+    <line x1="100" y1="92" x2="142" y2="92" marker-end="url(#ar)"/>
+    <!-- controller -->
+    <rect x="146" y="70" width="84" height="44" rx="6" fill="#375E9D"/>
+    <line x1="230" y1="92" x2="270" y2="92" marker-end="url(#ar)"/>
+    <!-- plant -->
+    <rect x="274" y="70" width="92" height="44" rx="6" fill="#230C75"/>
+    <line x1="366" y1="92" x2="452" y2="92" marker-end="url(#ar)"/>
+    <!-- feedback path -->
+    <circle cx="402" cy="92" r="3.2" fill="#1b1550" stroke="none"/>
+    <path d="M402,92 L402,164 L88,164 L88,112" marker-end="url(#ar)"/>
+  </g>
+  <g fill="#1b1550" font-size="15" font-weight="700">
+    <text x="2" y="86">r</text>
+    <text x="456" y="86">y</text>
+    <text x="82" y="84">&#931;</text>
+    <text x="178" y="97" fill="#ffffff">C</text>
+    <text x="312" y="97" fill="#ffffff">P</text>
+  </g>
+  <g fill="#1b1550" font-size="12">
+    <text x="74" y="80">+</text>
+    <text x="70" y="126">&#8722;</text>
+    <text x="116" y="84">e</text>
+    <text x="146" y="186" font-size="11" fill="#5a5f87">&#931; = summing junction &#183; C = controller &#183; P = plant</text>
+  </g>
+</svg>
