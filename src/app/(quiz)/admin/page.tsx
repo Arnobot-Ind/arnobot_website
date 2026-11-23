@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArnobotLogo } from "@/components/quiz/Brand";
@@ -219,6 +219,38 @@ function ApplicantsTab({
 }) {
   const router = useRouter();
   const [menu, setMenu] = useState<{ id: string; right: number; top?: number; bottom?: number } | null>(null);
+  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 } | null>(null);
+  const [f, setF] = useState(NO_FILTERS);
+  const filtering = JSON.stringify(f) !== JSON.stringify(NO_FILTERS);
+
+  const roles = useMemo(
+    () => [...new Set(applicants.map((a) => a.role).filter((r): r is string => !!r))].sort(),
+    [applicants]
+  );
+
+  const shown = useMemo(() => {
+    const q = f.q.trim().toLowerCase();
+    const rows = applicants.filter(
+      (a) =>
+        (!q || `${a.name} ${a.email} ${a.phone ?? ""} ${a.college ?? ""}`.toLowerCase().includes(q)) &&
+        (!f.role || a.role === f.role) &&
+        (!f.status || a.status === f.status) &&
+        (!f.result || (f.result === "pass" ? a.passed === true : f.result === "fail" ? a.passed === false : a.passed == null)) &&
+        (!f.stage || (a.stage ?? "Applied") === f.stage) &&
+        (!f.decision || (a.decision ?? "pending") === f.decision)
+    );
+    if (!sort) return rows; // server order: newest application first
+    return [...rows].sort((x, y) => {
+      const a = sortValue(x, sort.key);
+      const b = sortValue(y, sort.key);
+      return (a < b ? -1 : a > b ? 1 : 0) * sort.dir;
+    });
+  }, [applicants, f, sort]);
+
+  /** Click cycles a column: ascending → descending → back to default order. */
+  function toggleSort(key: SortKey) {
+    setSort((s) => (s?.key !== key ? { key, dir: 1 } : s.dir === 1 ? { key, dir: -1 } : null));
+  }
 
   async function del(a: Applicant) {
     if (
@@ -256,30 +288,72 @@ function ApplicantsTab({
           ⬇ Export CSV
         </a>
       </div>
+      <div className="card p-3 mb-4 flex flex-wrap items-center gap-2">
+        <input
+          value={f.q}
+          onChange={(e) => setF({ ...f, q: e.target.value })}
+          placeholder="Search name, email, phone, college…"
+          className="flex-1 min-w-[220px] rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-steel focus:ring-4 focus:ring-steel/15"
+        />
+        <FilterSelect label="Role" value={f.role} onChange={(role) => setF({ ...f, role })} options={roles} />
+        <FilterSelect
+          label="Status"
+          value={f.status}
+          onChange={(status) => setF({ ...f, status })}
+          options={[...new Set(applicants.map((a) => a.status))].sort()}
+        />
+        <FilterSelect
+          label="Result"
+          value={f.result}
+          onChange={(result) => setF({ ...f, result })}
+          options={[["pass", "PASS"], ["fail", "FAIL"], ["none", "Not taken"]]}
+        />
+        <FilterSelect label="Stage" value={f.stage} onChange={(stage) => setF({ ...f, stage })} options={[...STAGES]} />
+        <FilterSelect
+          label="Decision"
+          value={f.decision}
+          onChange={(decision) => setF({ ...f, decision })}
+          options={["pending", "accepted", "rejected"]}
+        />
+        {(filtering || sort) && (
+          <button
+            onClick={() => {
+              setF(NO_FILTERS);
+              setSort(null);
+            }}
+            className="text-sm font-medium text-muted hover:text-ink px-2"
+          >
+            ✕ Clear
+          </button>
+        )}
+        <span className="ml-auto text-xs text-muted tabular-nums px-1">
+          {shown.length === applicants.length ? `${applicants.length} applicants` : `${shown.length} of ${applicants.length}`}
+        </span>
+      </div>
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs font-semibold uppercase tracking-wider text-muted bg-surfaceAlt border-b border-line">
-                <th className="px-4 py-3">Candidate</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Score</th>
-                <th className="px-4 py-3">Result</th>
-                <th className="px-4 py-3">Completed</th>
-                <th className="px-4 py-3">Stage</th>
-                <th className="px-4 py-3">Decision</th>
+                <SortTh k="name" sort={sort} onSort={toggleSort}>Candidate</SortTh>
+                <SortTh k="status" sort={sort} onSort={toggleSort}>Status</SortTh>
+                <SortTh k="score" sort={sort} onSort={toggleSort}>Score</SortTh>
+                <SortTh k="result" sort={sort} onSort={toggleSort}>Result</SortTh>
+                <SortTh k="completed" sort={sort} onSort={toggleSort}>Completed</SortTh>
+                <SortTh k="stage" sort={sort} onSort={toggleSort}>Stage</SortTh>
+                <SortTh k="decision" sort={sort} onSort={toggleSort}>Decision</SortTh>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
-              {applicants.length === 0 && (
+              {shown.length === 0 && (
                 <tr>
                   <td colSpan={8} className="px-4 py-10 text-center text-muted">
-                    No applicants yet.
+                    {applicants.length === 0 ? "No applicants yet." : "No applicants match these filters."}
                   </td>
                 </tr>
               )}
-              {applicants.map((a) => (
+              {shown.map((a) => (
                 <tr
                   key={a.id}
                   onClick={() => router.push(`/admin/${encodeURIComponent(a.id)}`)}
@@ -402,6 +476,90 @@ function ApplicantsTab({
         </div>
       </div>
     </div>
+  );
+}
+
+type SortKey = "name" | "status" | "score" | "result" | "completed" | "stage" | "decision";
+
+const NO_FILTERS = { q: "", role: "", status: "", result: "", stage: "", decision: "" };
+
+/** Comparable value per column; missing values sort first when ascending. */
+function sortValue(a: Applicant, key: SortKey): string | number {
+  switch (key) {
+    case "name":
+      return a.name.toLowerCase();
+    case "status":
+      return a.status;
+    case "score":
+      return a.percent ?? -1;
+    case "result":
+      return a.passed == null ? -1 : a.passed ? 1 : 0;
+    case "completed":
+      return a.completedAt ? new Date(a.completedAt).getTime() : 0;
+    case "stage":
+      return STAGES.indexOf(a.stage ?? "Applied");
+    case "decision":
+      return a.decision ?? "pending";
+  }
+}
+
+/** A column header that sorts the table by its key; shows ▲/▼ when active. */
+function SortTh({
+  k,
+  sort,
+  onSort,
+  children,
+}: {
+  k: SortKey;
+  sort: { key: SortKey; dir: 1 | -1 } | null;
+  onSort: (k: SortKey) => void;
+  children: React.ReactNode;
+}) {
+  const dir = sort?.key === k ? sort.dir : 0;
+  return (
+    <th className="px-4 py-3" aria-sort={dir === 1 ? "ascending" : dir === -1 ? "descending" : undefined}>
+      <button
+        onClick={() => onSort(k)}
+        className={`inline-flex items-center gap-1 uppercase tracking-wider hover:text-ink ${dir ? "text-navy" : ""}`}
+      >
+        {children}
+        <span className={dir ? "" : "opacity-40"}>{dir === 1 ? "▲" : dir === -1 ? "▼" : "↕"}</span>
+      </button>
+    </th>
+  );
+}
+
+/** A compact <select> whose first option ("All …") clears the filter. */
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: (string | readonly [string, string])[];
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      aria-label={`Filter by ${label.toLowerCase()}`}
+      className={`rounded-lg border px-3 py-2 text-sm outline-none focus:border-steel max-w-[220px] ${
+        value ? "border-navy text-navy font-semibold bg-navy/5" : "border-line text-body bg-white"
+      }`}
+    >
+      <option value="">All {label.toLowerCase()}s</option>
+      {options.map((o) => {
+        const [v, text] = typeof o === "string" ? [o, o] : o;
+        return (
+          <option key={v} value={v}>
+            {text}
+          </option>
+        );
+      })}
+    </select>
   );
 }
 
