@@ -38,6 +38,8 @@ function getTransporter(): Transporter {
 
 export interface OutgoingMail {
   readonly fromName: string;
+  /** Defaults to the ARNOBOT inbox (MAIL_TO). */
+  readonly to?: { readonly name: string; readonly address: string };
   readonly subject: string;
   readonly html: string;
   readonly text: string;
@@ -52,7 +54,7 @@ export async function sendMail(message: OutgoingMail): Promise<void> {
 
   await getTransporter().sendMail({
     from: { name: message.fromName, address: MAIL_FROM },
-    to: { name: 'ARNOBOT', address: MAIL_TO },
+    to: message.to ?? { name: 'ARNOBOT', address: MAIL_TO },
     replyTo: message.replyTo?.address ? message.replyTo : undefined,
     subject: message.subject,
     html: message.html,

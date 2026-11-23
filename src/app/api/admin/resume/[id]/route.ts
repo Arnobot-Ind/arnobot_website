@@ -29,10 +29,16 @@ export async function GET(
     : Buffer.from(row.resume_data as unknown as Uint8Array);
 
   const filename = (row.resume_name || "resume").replace(/[^\w.\-]+/g, "_");
+  // Only PDFs render inline (for the dashboard's viewer); anything else an
+  // applicant uploaded is forced to download so it can't run on this origin.
+  // Upload only accepts .pdf/.doc/.docx names; the stored MIME is browser-supplied, so key off the name.
+  const isPdf = /\.pdf$/i.test(row.resume_name || "");
+  const inline = isPdf && new URL(req.url).searchParams.has("inline");
   return new NextResponse(new Uint8Array(data), {
     headers: {
-      "Content-Type": row.resume_mime || "application/octet-stream",
-      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Type": isPdf ? "application/pdf" : row.resume_mime || "application/octet-stream",
+      "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="${filename}"`,
+      "X-Content-Type-Options": "nosniff",
       "Content-Length": String(data.length),
     },
   });

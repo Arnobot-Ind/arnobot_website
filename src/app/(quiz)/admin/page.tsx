@@ -1,31 +1,12 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArnobotLogo } from "@/components/quiz/Brand";
+import { STAGES } from "@/lib/hiring-stages";
+import { Centered, DecisionBadge, type Applicant } from "./_shared";
 
-type Applicant = {
-  id: string;
-  email: string;
-  name: string;
-  phone: string | null;
-  address: string | null;
-  place: string | null;
-  birthYear: number | null;
-  gradYear: number | null;
-  college: string | null;
-  degree: string | null;
-  cgpa: string | null;
-  projects: string | null;
-  role: string | null;
-  resumeName: string | null;
-  status: string;
-  score: number | null;
-  total: number | null;
-  percent: number | null;
-  passed: boolean | null;
-  completedAt: string | null;
-  createdAt: string;
-};
 type Stats = { total: number; completed: number; passed: number };
 type Question = {
   id: number;
@@ -236,7 +217,8 @@ function ApplicantsTab({
   applicants: Applicant[];
   onRefresh: () => void;
 }) {
-  const [open, setOpen] = useState<string | null>(null);
+  const router = useRouter();
+  const [menu, setMenu] = useState<{ id: string; right: number; top?: number; bottom?: number } | null>(null);
 
   async function del(a: Applicant) {
     if (
@@ -246,6 +228,15 @@ function ApplicantsTab({
     )
       return;
     await fetch(`/api/admin/applicants?id=${encodeURIComponent(a.id)}`, { method: "DELETE" });
+    onRefresh();
+  }
+
+  async function decide(a: Applicant, decision: Applicant["decision"]) {
+    await fetch("/api/admin/applicants", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: a.id, decision }),
+    });
     onRefresh();
   }
 
@@ -274,117 +265,137 @@ function ApplicantsTab({
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Score</th>
                 <th className="px-4 py-3">Result</th>
-                <th className="px-4 py-3">Resume</th>
                 <th className="px-4 py-3">Completed</th>
+                <th className="px-4 py-3">Stage</th>
+                <th className="px-4 py-3">Decision</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
               {applicants.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-muted">
+                  <td colSpan={8} className="px-4 py-10 text-center text-muted">
                     No applicants yet.
                   </td>
                 </tr>
               )}
               {applicants.map((a) => (
-                <Fragment key={a.id}>
-                  <tr className="border-b border-line hover:bg-surfaceAlt/60">
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => setOpen(open === a.id ? null : a.id)}
-                        className="text-left group"
-                      >
-                        <div className="font-semibold text-ink group-hover:text-navy">
-                          <span className="text-muted mr-1.5">{open === a.id ? "▾" : "▸"}</span>
-                          {a.name}
-                        </div>
-                        <div className="text-xs text-muted mt-0.5">{a.email}</div>
-                        {a.phone && <div className="text-xs text-muted">{a.phone}</div>}
-                      </button>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`text-xs font-medium rounded-full px-2.5 py-1 border ${
-                          a.status === "completed"
-                            ? "border-navy/20 text-navy bg-navy/5"
-                            : "border-warn/30 text-warn bg-amber-50"
-                        }`}
-                      >
-                        {a.status}
+                <tr
+                  key={a.id}
+                  onClick={() => router.push(`/admin/${encodeURIComponent(a.id)}`)}
+                  className="border-b border-line hover:bg-surfaceAlt/60 cursor-pointer"
+                >
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/admin/${encodeURIComponent(a.id)}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-semibold text-ink hover:text-navy"
+                    >
+                      {a.name}
+                    </Link>
+                    <div className="text-xs text-muted mt-0.5">{a.email}</div>
+                    {a.phone && <div className="text-xs text-muted">{a.phone}</div>}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`text-xs font-medium rounded-full px-2.5 py-1 border ${
+                        a.status === "completed"
+                          ? "border-navy/20 text-navy bg-navy/5"
+                          : "border-warn/30 text-warn bg-amber-50"
+                      }`}
+                    >
+                      {a.status}
+                    </span>
+                    {a.status === "expired" && a.startedAt && a.completedAt && (
+                      <span className="block text-xs text-muted mt-1.5">
+                        sent {Math.round((new Date(a.completedAt).getTime() - new Date(a.startedAt).getTime()) / 60000)} min after start
                       </span>
-                    </td>
-                    <td className="px-4 py-3 tabular-nums text-ink">
-                      {a.score != null ? (
-                        <>
-                          <span className="font-semibold">
-                            {a.score}/{a.total}
-                          </span>{" "}
-                          <span className="text-muted">({a.percent}%)</span>
-                        </>
-                      ) : (
-                        <span className="text-muted">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 tabular-nums text-ink">
+                    {a.score != null ? (
+                      <>
+                        <span className="font-semibold">
+                          {a.score}/{a.total}
+                        </span>{" "}
+                        <span className="text-muted">({a.percent}%)</span>
+                      </>
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {a.passed == null ? (
+                      <span className="text-muted">—</span>
+                    ) : a.passed ? (
+                      <span className="font-semibold text-ok">PASS</span>
+                    ) : (
+                      <span className="font-semibold text-bad">FAIL</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-muted">
+                    {a.completedAt ? new Date(a.completedAt).toLocaleString() : "—"}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className="text-xs font-semibold text-navy">{a.stage ?? "Applied"}</span>
+                    <span className="block text-[11px] text-muted mt-0.5">
+                      step {STAGES.indexOf(a.stage ?? "Applied") + 1} of {STAGES.length}
+                      {a.remarks && (
+                        <span className="ml-1.5" title={a.remarks}>
+                          · 📝
+                        </span>
                       )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {a.passed == null ? (
-                        <span className="text-muted">—</span>
-                      ) : a.passed ? (
-                        <span className="font-semibold text-ok">PASS</span>
-                      ) : (
-                        <span className="font-semibold text-bad">FAIL</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {a.resumeName ? (
-                        <a
-                          href={`/api/admin/resume/${a.id}`}
-                          className="text-steel hover:text-navy hover:underline text-sm font-medium"
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <DecisionBadge decision={a.decision} />
+                  </td>
+                  <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={(e) => {
+                        const r = e.currentTarget.getBoundingClientRect();
+                        const right = window.innerWidth - r.right;
+                        // Open upward when the ~220px menu would run off the bottom of the window.
+                        const place =
+                          r.bottom + 224 > window.innerHeight
+                            ? { bottom: window.innerHeight - r.top + 4 }
+                            : { top: r.bottom + 4 };
+                        setMenu(menu?.id === a.id ? null : { id: a.id, right, ...place });
+                      }}
+                      className="h-8 w-8 rounded-lg text-lg leading-none text-muted hover:text-ink hover:bg-surfaceAlt transition"
+                      aria-label={`Actions for ${a.name}`}
+                      aria-expanded={menu?.id === a.id}
+                    >
+                      ⋯
+                    </button>
+                    {menu?.id === a.id && (
+                      <>
+                        {/* Fixed so the table's overflow can't clip it; the backdrop closes it. */}
+                        <div className="fixed inset-0 z-30" onClick={() => setMenu(null)} />
+                        <div
+                          className="fixed z-40 w-48 rounded-xl border border-line bg-white py-1.5 text-left text-sm shadow-lg"
+                          style={{ top: menu.top, bottom: menu.bottom, right: menu.right }}
+                          onClick={() => setMenu(null)}
                         >
-                          ⬇ download
-                        </a>
-                      ) : (
-                        <span className="text-muted">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted">
-                      {a.completedAt ? new Date(a.completedAt).toLocaleString() : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => del(a)}
-                        className="text-xs font-medium text-bad hover:underline"
-                        title="Delete this application"
-                      >
-                        delete
-                      </button>
-                    </td>
-                  </tr>
-                  {open === a.id && (
-                    <tr className="border-b border-line bg-surfaceAlt/50">
-                      <td colSpan={7} className="px-5 py-4">
-                        <div className="grid sm:grid-cols-3 gap-x-8 gap-y-2.5 text-sm">
-                          <Detail label="Applying for" value={a.role} />
-                          <Detail label="Birth year" value={a.birthYear} />
-                          <Detail label="Graduation year" value={a.gradYear} />
-                          <Detail label="City / Place" value={a.place} />
-                          <Detail label="College" value={a.college} />
-                          <Detail label="Degree" value={a.degree} />
-                          <Detail label="CGPA / Marks" value={a.cgpa} />
-                          <div className="sm:col-span-3">
-                            <Detail label="Address" value={a.address} />
-                          </div>
-                          {a.projects && (
-                            <div className="sm:col-span-3">
-                              <div className="text-muted mb-1 font-medium">Projects</div>
-                              <div className="whitespace-pre-wrap text-ink">{a.projects}</div>
-                            </div>
+                          <MenuItem onClick={() => router.push(`/admin/${encodeURIComponent(a.id)}`)}>
+                            📄 View details
+                          </MenuItem>
+                          {a.decision !== "accepted" && (
+                            <MenuItem onClick={() => decide(a, "accepted")} className="text-ok">✓ Accept</MenuItem>
                           )}
+                          {a.decision !== "rejected" && (
+                            <MenuItem onClick={() => decide(a, "rejected")} className="text-bad">✕ Reject</MenuItem>
+                          )}
+                          {a.decision && (
+                            <MenuItem onClick={() => decide(a, null)}>↺ Reset to pending</MenuItem>
+                          )}
+                          <div className="my-1.5 border-t border-line" />
+                          <MenuItem onClick={() => del(a)} className="text-bad">🗑 Delete</MenuItem>
                         </div>
-                      </td>
-                    </tr>
-                  )}
-                </Fragment>
+                      </>
+                    )}
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>
@@ -393,6 +404,23 @@ function ApplicantsTab({
     </div>
   );
 }
+
+function MenuItem({
+  onClick,
+  className = "text-body",
+  children,
+}: {
+  onClick: () => void;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button onClick={onClick} className={`block w-full px-4 py-2 text-left font-medium hover:bg-surfaceAlt ${className}`}>
+      {children}
+    </button>
+  );
+}
+
 
 function QuestionsTab({
   questions,
@@ -890,15 +918,3 @@ function StatCard({
   );
 }
 
-function Detail({ label, value }: { label: string; value: string | number | null }) {
-  return (
-    <div>
-      <span className="text-muted font-medium">{label}: </span>
-      <span className="text-ink">{value ?? "—"}</span>
-    </div>
-  );
-}
-
-function Centered({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-[100dvh] grid place-items-center px-4">{children}</div>;
-}

@@ -123,6 +123,9 @@ async function initSchema(): Promise<void> {
     "projects TEXT",
     "profile JSONB",
     "role TEXT",
+    "decision TEXT", // null (pending) | accepted | rejected
+    "stage TEXT", // one of STAGES in hiring-stages.ts; null = Applied
+    "remarks TEXT",
   ]) {
     await sql.unsafe(`ALTER TABLE applicants ADD COLUMN IF NOT EXISTS ${col}`);
   }
