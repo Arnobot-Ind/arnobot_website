@@ -23,6 +23,8 @@ export default function ApplicantPage() {
   const [compose, setCompose] = useState<{ subject: string; body: string } | null>(null);
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState("");
+  const [view, setView] = useState<"overview" | "emails">("overview");
+  const [emails, setEmails] = useState<SentEmail[]>([]);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/admin/applicants?id=${encodeURIComponent(id)}`);
@@ -31,10 +33,16 @@ export default function ApplicantPage() {
     setA(data.applicants?.[0] ?? "missing");
   }, [id]);
 
+  const loadEmails = useCallback(async () => {
+    const res = await fetch(`/api/admin/emails?applicant=${encodeURIComponent(id)}`);
+    if (res.ok) setEmails((await res.json()).emails);
+  }, [id]);
+
   /* eslint-disable react-hooks/set-state-in-effect -- same async-load pattern as the dashboard. */
   useEffect(() => {
     void load();
-  }, [load]);
+    void loadEmails();
+  }, [load, loadEmails]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   if (a === null) return <Centered><span className="text-muted">Loading…</span></Centered>;
@@ -81,6 +89,7 @@ export default function ApplicantPage() {
     if (res.ok) {
       setCompose(null);
       setMsg("Mail sent ✓");
+      void loadEmails();
     } else {
       const d = await res.json().catch(() => ({}));
       setMsg(d.error || "Mail failed.");
@@ -198,6 +207,29 @@ export default function ApplicantPage() {
           )}
         </div>
 
+        <div className="flex gap-1 border-b border-line">
+          {(
+            [
+              ["overview", "Overview"],
+              ["emails", `Emails sent (${emails.length})`],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setView(key)}
+              className={`px-5 py-2.5 text-sm font-semibold border-b-2 -mb-px transition ${
+                view === key ? "border-navy text-navy" : "border-transparent text-muted hover:text-ink"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {view === "emails" && <EmailsTab emails={emails} />}
+
+        {view === "overview" && (
+        <>
         <ProgressEditor key={`${a.id}:${a.remarks ?? ""}`} a={a} onSaved={load} />
 
         <div className="card p-6">
@@ -224,7 +256,58 @@ export default function ApplicantPage() {
         <div className="card p-6">
           <ResumeViewer a={a} />
         </div>
+        </>
+        )}
       </div>
+    </div>
+  );
+}
+
+type SentEmail = { id: number; to: string; subject: string; body: string; messageId: string | null; sentAt: string };
+
+/** Gmail search for the exact message; works when signed in to the sending mailbox. */
+function gmailLink(messageId: string): string {
+  const q = `rfc822msgid:${messageId.replace(/[<>]/g, "")}`;
+  return `https://mail.google.com/mail/?authuser=contact@arnobot.in#search/${encodeURIComponent(q)}`;
+}
+
+function EmailsTab({ emails }: { emails: SentEmail[] }) {
+  if (emails.length === 0) {
+    return (
+      <div className="card p-8 text-center text-sm text-muted">
+        No emails sent to this candidate yet. Use <b className="text-ink">✉ Send email</b> above.
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {emails.map((e) => (
+        <details key={e.id} className="card p-5 group">
+          <summary className="cursor-pointer list-none flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span className="text-xs font-semibold rounded-full px-2.5 py-1 border border-ok/30 text-ok bg-okbg">✓ sent</span>
+            <span className="font-semibold text-ink">{e.subject}</span>
+            <span className="text-xs text-muted">to {e.to}</span>
+            <span className="ml-auto text-xs text-muted">{new Date(e.sentAt).toLocaleString()}</span>
+          </summary>
+          <div className="mt-4 whitespace-pre-wrap text-sm text-body border-t border-line pt-4">{e.body}</div>
+          <div className="mt-4 flex flex-wrap gap-4 text-sm font-medium">
+            <a href={`/api/admin/emails?id=${e.id}`} target="_blank" rel="noopener" className="text-steel hover:underline">
+              ↗ View email as sent
+            </a>
+            {e.messageId && (
+              <a
+                href={gmailLink(e.messageId)}
+                target="_blank"
+                rel="noopener"
+                className="text-steel hover:underline"
+                title="Opens the message in the contact@arnobot.in Gmail, if you're signed in to it"
+              >
+                ↗ Open in Gmail
+              </a>
+            )}
+          </div>
+        </details>
+      ))}
     </div>
   );
 }

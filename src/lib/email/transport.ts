@@ -47,12 +47,13 @@ export interface OutgoingMail {
   readonly attachments?: ReadonlyArray<{ readonly filename: string; readonly content: Buffer }>;
 }
 
-export async function sendMail(message: OutgoingMail): Promise<void> {
+/** Resolves to the SMTP Message-ID, so a sent mail can be found again in the mailbox. */
+export async function sendMail(message: OutgoingMail): Promise<string | undefined> {
   if (!isMailConfigured()) {
     throw new Error('SMTP credentials are not configured (set SMTP_USER and SMTP_PASS).');
   }
 
-  await getTransporter().sendMail({
+  const info = await getTransporter().sendMail({
     from: { name: message.fromName, address: MAIL_FROM },
     to: message.to ?? { name: 'ARNOBOT', address: MAIL_TO },
     replyTo: message.replyTo?.address ? message.replyTo : undefined,
@@ -61,4 +62,5 @@ export async function sendMail(message: OutgoingMail): Promise<void> {
     text: message.text,
     attachments: message.attachments ? [...message.attachments] : undefined,
   });
+  return info.messageId;
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ensureDb, sql } from "@/lib/db";
 import { isAdmin } from "@/lib/admin-guard";
 import { sendMail } from "@/lib/email/transport";
+import { renderLetter } from "@/lib/email/layout";
 import { escapeHtml, nl2br } from "@/lib/validation";
 import { STAGES } from "@/lib/hiring-stages";
 
@@ -201,18 +202,25 @@ export async function POST(req: NextRequest) {
   }
   const [a] = await sql<{ name: string; email: string }[]>`SELECT name, email FROM applicants WHERE id = ${id}`;
   if (!a) return NextResponse.json({ error: "Applicant not found" }, { status: 404 });
+  const html = renderLetter({ title: escapeHtml(subject), bodyHtml: nl2br(escapeHtml(text)) });
+  let messageId: string | undefined;
   try {
-    await sendMail({
+    messageId = await sendMail({
       fromName: "ARNOBOT Hiring",
       to: { name: a.name, address: a.email },
       subject,
       text,
-      html: `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222">${nl2br(escapeHtml(text))}</div>`,
+      html,
     });
   } catch (err) {
     console.error("[admin] candidate mail failed", err);
     return NextResponse.json({ error: "Mail could not be sent. Check the SMTP settings." }, { status: 502 });
   }
+  // Logged only after a successful send, so the Emails tab never lists a mail that didn't go out.
+  await sql`
+    INSERT INTO applicant_emails (applicant_id, to_email, subject, body, html, message_id)
+    VALUES (${id}, ${a.email}, ${subject}, ${text}, ${html}, ${messageId ?? null})
+  `;
   return NextResponse.json({ ok: true });
 }
 

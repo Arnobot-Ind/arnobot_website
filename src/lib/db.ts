@@ -130,6 +130,20 @@ async function initSchema(): Promise<void> {
     await sql.unsafe(`ALTER TABLE applicants ADD COLUMN IF NOT EXISTS ${col}`);
   }
 
+  // Every email sent to a candidate from the dashboard, as it was sent.
+  await sql`
+    CREATE TABLE IF NOT EXISTS applicant_emails (
+      id           SERIAL PRIMARY KEY,
+      applicant_id TEXT NOT NULL REFERENCES applicants(id) ON DELETE CASCADE,
+      to_email     TEXT NOT NULL,
+      subject      TEXT NOT NULL,
+      body         TEXT NOT NULL,
+      html         TEXT NOT NULL,
+      message_id   TEXT,
+      sent_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+
   // Roles: each names a job and the skills (question categories) it draws from.
   await sql`
     CREATE TABLE IF NOT EXISTS roles (
