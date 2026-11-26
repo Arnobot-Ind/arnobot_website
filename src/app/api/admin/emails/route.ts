@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureDb, sql } from "@/lib/db";
-import { isAdmin } from "@/lib/admin-guard";
+import { isAdmin, isErp } from "@/lib/admin-guard";
 
 export const runtime = "nodejs";
 
@@ -9,7 +9,7 @@ export const runtime = "nodejs";
  * ?id=<n>          → that email's HTML, exactly as sent, for viewing in a tab
  */
 export async function GET(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!isAdmin(req) && !isErp(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   await ensureDb();
@@ -31,9 +31,17 @@ export async function GET(req: NextRequest) {
   const applicant = url.searchParams.get("applicant");
   if (!applicant) return NextResponse.json({ error: "applicant or id required" }, { status: 400 });
   const rows = await sql<
-    { id: number; to_email: string; subject: string; body: string; message_id: string | null; sent_at: Date }[]
+    {
+      id: number;
+      to_email: string;
+      subject: string;
+      body: string;
+      message_id: string | null;
+      sent_at: Date;
+      attachment_names: string[] | null;
+    }[]
   >`
-    SELECT id, to_email, subject, body, message_id, sent_at
+    SELECT id, to_email, subject, body, message_id, sent_at, attachment_names
     FROM applicant_emails WHERE applicant_id = ${applicant}
     ORDER BY sent_at DESC
   `;
@@ -45,6 +53,7 @@ export async function GET(req: NextRequest) {
       body: r.body,
       messageId: r.message_id,
       sentAt: r.sent_at,
+      attachmentNames: r.attachment_names ?? [],
     })),
   });
 }

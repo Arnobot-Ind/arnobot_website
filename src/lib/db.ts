@@ -143,6 +143,8 @@ async function initSchema(): Promise<void> {
       sent_at      TIMESTAMPTZ NOT NULL DEFAULT now()
     )
   `;
+  // Names of the files attached to each email (the ERP attaches offer letters); null on older rows.
+  await sql`ALTER TABLE applicant_emails ADD COLUMN IF NOT EXISTS attachment_names JSONB`;
 
   // Roles: each names a job and the skills (question categories) it draws from.
   await sql`

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureDb, sql } from "@/lib/db";
-import { isAdmin } from "@/lib/admin-guard";
+import { isAdmin, isErp } from "@/lib/admin-guard";
+import { parseAttachments } from "@/lib/erp-mail";
 import { sendMail } from "@/lib/email/transport";
 import { renderLetter } from "@/lib/email/layout";
 import { escapeHtml, nl2br } from "@/lib/validation";
@@ -37,7 +38,7 @@ type Row = {
 };
 
 export async function GET(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!isAdmin(req) && !isErp(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   await ensureDb();
@@ -158,7 +159,7 @@ export async function GET(req: NextRequest) {
 
 /** Partial update of the admin-owned fields: decision, stage, remarks. */
 export async function PATCH(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!isAdmin(req) && !isErp(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   await ensureDb();
@@ -189,7 +190,7 @@ export async function PATCH(req: NextRequest) {
 
 /** Emails a candidate from contact@arnobot.in. The address comes from the DB, never the client. */
 export async function POST(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!isAdmin(req) && !isErp(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   await ensureDb();
@@ -199,6 +200,12 @@ export async function POST(req: NextRequest) {
   const text = String(body.body || "").trim().slice(0, 10000);
   if (!id || !subject || !text) {
     return NextResponse.json({ error: "id, subject and body are required" }, { status: 400 });
+  }
+  let attachments: ReturnType<typeof parseAttachments>;
+  try {
+    attachments = parseAttachments(body.attachments);
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 400 });
   }
   const [a] = await sql<{ name: string; email: string }[]>`SELECT name, email FROM applicants WHERE id = ${id}`;
   if (!a) return NextResponse.json({ error: "Applicant not found" }, { status: 404 });
@@ -211,6 +218,7 @@ export async function POST(req: NextRequest) {
       subject,
       text,
       html,
+      attachments,
     });
   } catch (err) {
     console.error("[admin] candidate mail failed", err);
@@ -218,10 +226,11 @@ export async function POST(req: NextRequest) {
   }
   // Logged only after a successful send, so the Emails tab never lists a mail that didn't go out.
   await sql`
-    INSERT INTO applicant_emails (applicant_id, to_email, subject, body, html, message_id)
-    VALUES (${id}, ${a.email}, ${subject}, ${text}, ${html}, ${messageId ?? null})
+    INSERT INTO applicant_emails (applicant_id, to_email, subject, body, html, message_id, attachment_names)
+    VALUES (${id}, ${a.email}, ${subject}, ${text}, ${html}, ${messageId ?? null},
+            ${sql.json(attachments.map((f) => f.filename))})
   `;
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, messageId: messageId ?? null });
 }
 
 export async function DELETE(req: NextRequest) {

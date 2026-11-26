@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureDb, sql } from "@/lib/db";
-import { isAdmin } from "@/lib/admin-guard";
+import { isAdmin, isErp } from "@/lib/admin-guard";
 
 export const runtime = "nodejs";
 
@@ -8,7 +8,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!isAdmin(req)) {
+  if (!isAdmin(req) && !isErp(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   await ensureDb();
